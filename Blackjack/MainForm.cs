@@ -13,56 +13,124 @@ namespace Blackjack
 {
     public partial class MainForm : Form
     {
-        Bitmap bufferedBitmap = null;
+        BlackjackGame game = new BlackjackGame();
+        
+        CardTableController gamecontroller = null;
+        
 
         public MainForm()
         {
             InitializeComponent();
+
+            game.addPlayer( new Player("Tim1", 10000) );
+            game.addPlayer( new Player("Tim2", 10000) );
+            game.addPlayer( new Player("Tim3", 10000) );
+            game.addPlayer( new Player("Tim4", 10000) );
+            game.addPlayer( new Player("Tim5", 10000) );
+            game.addPlayer( new Player("Tim6", 10000) );
+            game.addPlayer( new Player("Tim7", 10000) );
+
+            gamecontroller = new CardTableController(game);
         }
+      
 
-        private void DrawTable()
-        {
-            bufferedBitmap = new Bitmap(this.Width, this.Height);
-            Graphics bufferedGraphics = Graphics.FromImage(bufferedBitmap);
-
-            bufferedGraphics.FillRectangle(new LinearGradientBrush(new Point(0, 0), new Point(bufferedBitmap.Width, bufferedBitmap.Height),
-                                                                        Color.LightGreen, Color.DarkGreen),
-                                                   0, 0, bufferedBitmap.Width, bufferedBitmap.Height);
-
-            Pen whitePen = new Pen(Color.White, 3);
-            Brush whiteBrush = new SolidBrush(Color.LightSalmon);
-            Font textFont = new Font("Broadway", 15);
-            for (int i = 0; i < 7; i++)
-            {
-                bufferedGraphics.DrawRectangle(whitePen, 30 + 105 * i, 270, 90, 120);
-                bufferedGraphics.DrawString("Player" + (i + 1), textFont, whiteBrush, 30 + 105 * i, 240);
-            }
-
-            bufferedGraphics.DrawRectangle(whitePen, 345, 50, 90, 120);
-            bufferedGraphics.DrawRectangle(whitePen, 450, 50, 90, 120);
-            bufferedGraphics.DrawString("Dealer", textFont, whiteBrush, 400, 20);
-
-            whitePen.Dispose();
-            whiteBrush.Dispose();
-            textFont.Dispose();
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            DrawTable();
+            game.GetDealer().PlayerHand.AddCard(game.GetDeck(0).PopCard());
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
-            if ( bufferedBitmap != null )
-                e.Graphics.DrawImage(bufferedBitmap, 0, 0);
+            gamecontroller.PrepareGraphics( this.Width, this.Height, e.Graphics );
+            e.Graphics.DrawImage( gamecontroller.GetShowTable(), 0, 0);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            DrawTable();
-            this.Invalidate();
+            gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
+            CreateGraphics().DrawImage(gamecontroller.GetShowTable(), 0, 0);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_Click(object sender, EventArgs e)
+        {
+            if (((MouseEventArgs)e).Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                //game.GetDealer().PlayerHand.AddCard(game.GetDeck(0).PopCard());
+                game.DealerActions();
+                CreateGraphics().DrawImage(gamecontroller.GetShowTable(), 0, 0);
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_MouseClick(object sender, MouseEventArgs e)
+        {
+            Rectangle[] hitrects = new Rectangle[7];
+            for (int i = 0; i < 7; i++)
+            {
+                hitrects[i] = new Rectangle(25 + 105*i, 285, 30, 30);
+                if ( hitrects[i].Contains(e.Location) && !game.IsStand( i ) )
+                {
+                    game.PlayerHit(i);
+                    CreateGraphics().DrawImage( gamecontroller.GetShowTable(), 0, 0 );
+                }
+            }
+
+            Rectangle[] standrects = new Rectangle[7];
+            for (int i = 0; i < 7; i++)
+            {
+                standrects[i] = new Rectangle(60 + 105 * i, 285, 30, 30);
+                if (standrects[i].Contains(e.Location))
+                {
+                    game.PlayerStand(i);
+                    CreateGraphics().DrawImage( gamecontroller.GetShowTable(), 0, 0 );
+                }
+            }
+
+            Rectangle[] doublerects = new Rectangle[7];
+            for (int i = 0; i < 7; i++)
+            {
+                doublerects[i] = new Rectangle(95 + 105 * i, 285, 30, 30);
+                if (doublerects[i].Contains(e.Location) && !game.IsStand( i ) )
+                {
+                    try
+                    {
+                        game.PlayerDouble(i);
+                        CreateGraphics().DrawImage( gamecontroller.GetShowTable(), 0, 0 );
+                    }
+                    catch (InvalidOperationException iex)
+                    {
+                        MessageBox.Show( "You've not enough money!" );
+                    }
+                }
+            }
         }
     }
 }

@@ -11,8 +11,9 @@ namespace Blackjack
         protected int money;
 	    protected int stake;
 
-        public Player( string nm = "Unknown", int mon = 1000 )
+        public Player( string nm = "Unknown", int mon = 1000 ) : base(nm)
         {
+            money = mon;
         }
 
 	    public int Stake

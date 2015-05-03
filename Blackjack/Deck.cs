@@ -10,7 +10,7 @@ namespace Blackjack
     {
         public const byte DECK_SIZE = 52;
 
-        protected List<Card> cards;
+        protected List<Card> cards = new List<Card>();
 
 
         public Deck()

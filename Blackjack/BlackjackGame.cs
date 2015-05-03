@@ -12,22 +12,44 @@ namespace Blackjack
         // The number of decks is 4
         public const int DECKS_COUNT = 4;
 
-        protected List<Player> players;			// aggregates the player
-	    protected CardHolder dealer;			// composite for the dealer
+        protected List<Player> players = new List<Player>();			// aggregates the player
+        private List<bool> stands = new List<bool>();
 
-	    Deck[] decks = new Deck [DECKS_COUNT];	// Shoes, DECKS_COUNT decks
+	    protected CardHolder dealer = new CardHolder( "Dealer" );			// composite for the dealer
+
+	    protected Deck[] decks = new Deck [DECKS_COUNT];	// Shoes, DECKS_COUNT decks
+
+        
 
 
         public BlackjackGame()
         {
-            dealer = new CardHolder( "Dealer" );
-	        dealer.SetScoreCounter( new BlackjackScoreCounter() );
+            dealer.SetScoreCounter( new BlackjackScoreCounter() );
+
+            for (int i = 0; i < DECKS_COUNT; i++)
+                decks[i] = new Deck();
         }
 	
 	    public void addPlayer( Player p )
         {
             p.SetScoreCounter( new BlackjackScoreCounter() );
             players.Add( p );
+            stands.Add( false );
+        }
+
+        public Player GetPlayer(int pos)
+        {
+            return players[pos];
+        }
+
+        public CardHolder GetDealer()
+        {
+            return dealer;
+        }
+
+        public Deck GetDeck(int pos)
+        {
+            return decks[pos];
         }
 
 
@@ -199,7 +221,7 @@ namespace Blackjack
 	        dealer.ClearHand();				// обнулим хэнды
 	        players[0].ClearHand();
 
-//	        for ( int i=0; i<4; i++ )		// перемешаем случайно все 4 колоды
+                                            // перемешаем случайно все колоды в шузах
             foreach (Deck d in decks)
 		        d.Shuffle();
 		
@@ -267,6 +289,30 @@ namespace Blackjack
 	        }
 
 	        //players[0].ShowMoney();			// показываем что там у игрока с фишками (деньгами) в целом после этой игры
+        }
+
+
+        public void PlayerHit( int nPlayer )
+        {
+            players[ nPlayer ].PlayerHand.AddCard( decks[0].PopCard() );
+        }
+
+        public void PlayerStand( int nPlayer )
+        {
+            stands[nPlayer] = true;
+        }
+
+        public void PlayerDouble( int nPlayer )
+        {
+            if (players[nPlayer].CanDoubleStake())
+                players[nPlayer].BonusStake(2);
+            else
+                throw new InvalidOperationException();
+        }
+
+        public bool IsStand(int nPlayer)
+        {
+            return stands[nPlayer];
         }
     }
 }

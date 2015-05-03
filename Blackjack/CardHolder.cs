@@ -12,7 +12,7 @@ namespace Blackjack
 
         protected string name;
 
-        protected Hand hand;
+        protected Hand hand = new Hand();
 
         public CardHolder( string nm = "Unknown" )
         {

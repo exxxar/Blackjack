@@ -60,7 +60,7 @@ namespace Blackjack
 
         public void Show(Graphics g)
         {
-            Bitmap b = new Bitmap(100,100);
+            Bitmap b = new Bitmap(@"Pictures\back.png");
             g.DrawImage( b, 0, 0 );
             b.Dispose();
         }

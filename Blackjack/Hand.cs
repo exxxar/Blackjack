@@ -8,7 +8,7 @@ namespace Blackjack
 {
     public class Hand
     {
-        protected List<Card> cards;
+        protected List<Card> cards = new List<Card>();
 
 
         public void AddCard( Card card )
