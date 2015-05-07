@@ -22,14 +22,6 @@ namespace Blackjack
         {
             InitializeComponent();
 
-            game.addPlayer( new Player("Tim1", 10000) );
-            game.addPlayer( new Player("Tim2", 10000) );
-            game.addPlayer( new Player("Tim3", 10000) );
-            game.addPlayer( new Player("Tim4", 10000) );
-            game.addPlayer( new Player("Tim5", 10000) );
-            game.addPlayer( new Player("Tim6", 10000) );
-            game.addPlayer( new Player("Tim7", 10000) );
-
             gamecontroller = new CardTableController(game);
         }
       
@@ -41,7 +33,19 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            game.GetDealer().PlayerHand.AddCard(game.GetDeck(0).PopCard());
+            StartGameForm form = new StartGameForm();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                foreach (Player p in form.players)
+                {
+                    MakeBetForm makeBetForm = new MakeBetForm(p);
+                    makeBetForm.ShowDialog();
+                    game.addPlayer(p);
+                }
+
+                gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
+                gamecontroller.MoveCardToDealer();
+            }
         }
 
 
@@ -98,8 +102,8 @@ namespace Blackjack
                 hitrects[i] = new Rectangle(25 + 105*i, 285, 30, 30);
                 if ( hitrects[i].Contains(e.Location) && !game.IsStand( i ) )
                 {
-                    game.PlayerHit(i);
-                    CreateGraphics().DrawImage( gamecontroller.GetShowTable(), 0, 0 );
+                    gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
+                    gamecontroller.MoveCardToPlayer( i );
                 }
             }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class Player : CardHolder
+    public class Player : CardHolder
     {
         protected int money;
 	    protected int stake;

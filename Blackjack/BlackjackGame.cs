@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class BlackjackGame: ICardGame
+    public class BlackjackGame: ICardGame
     {
         // The number of decks is 4
         public const int DECKS_COUNT = 4;
@@ -52,6 +52,10 @@ namespace Blackjack
             return decks[pos];
         }
 
+        public int GetPlayersCount()
+        {
+            return players.Count;
+        }
 
         // показать игровой стол:
         //		- сколько карт в каждой колоде
@@ -292,9 +296,15 @@ namespace Blackjack
         }
 
 
-        public void PlayerHit( int nPlayer )
+        public Card PlayerHit( int nPlayer, out int nDeck )
         {
-            players[ nPlayer ].PlayerHand.AddCard( decks[0].PopCard() );
+            Random r = new Random();
+
+            nDeck = r.Next(4);
+            Card card = decks[ nDeck ].PopCard();
+            players[ nPlayer ].PlayerHand.AddCard( card );
+
+            return card;
         }
 
         public void PlayerStand( int nPlayer )

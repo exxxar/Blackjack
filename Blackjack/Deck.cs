@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class Deck
+    public class Deck
     {
         public const byte DECK_SIZE = 52;
 
@@ -20,7 +20,7 @@ namespace Blackjack
 
 	    public Card PopCard()
         {
-            Card card = cards.Last(); 
+            Card card = cards.Last();
             cards.Remove( card );
             return card;
         }
@@ -43,7 +43,7 @@ namespace Blackjack
 
 	    public void Shuffle()
         {
-            UnpackNew();
+            //UnpackNew();
             Random rand = new Random();
             cards = cards.OrderBy(item => rand.Next()).ToList();
         }

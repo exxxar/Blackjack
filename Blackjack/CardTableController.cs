@@ -18,9 +18,13 @@ namespace Blackjack
         private Bitmap[] cardImages = new Bitmap [52];
 
         Point dealerCoords;
-        public Point[] cardsCoords = new Point[7];
+        public Point[] playerCoords = new Point[7];
+
+        public Point[] shoesCoords = new Point[4];
+        public Point[] shoesCoordsToDraw = new Point[4];
 
         BlackjackGame game = null;
+
         
 
         public CardTableController( BlackjackGame blackjackgame )
@@ -43,8 +47,14 @@ namespace Blackjack
 
             for (int i = 0; i < 7; i++)
             {
-                cardsCoords[i].X = 30 + 105*i;
-                cardsCoords[i].Y = 320;
+                playerCoords[i].X = 30 + 105*i;
+                playerCoords[i].Y = 320;
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                shoesCoords[i].X = 10 + 100 * i;
+                shoesCoords[i].Y = 50;
             }
         }
 
@@ -61,6 +71,11 @@ namespace Blackjack
         }
 
 
+        public void DrawCard( int pos, int x, int y )
+        {
+            g.DrawImage( cardImages[pos], x, y, 90, 130 );
+        }
+
         public void ShowDealerHand()
         {
             for (int i = 0; i < game.GetDealer().PlayerHand.GetCardsNumber(); i++ )
@@ -71,9 +86,13 @@ namespace Blackjack
 
         public void ShowPlayerHand( int nPlayer )
         {
+            Random r = new Random();
+
             for (int i = 0; i < game.GetPlayer(nPlayer).PlayerHand.GetCardsNumber(); i++)
+            {
                 g.DrawImage(cardImages[game.GetPlayer(nPlayer).PlayerHand[i].getNumber()],
-                    cardsCoords[nPlayer].X, cardsCoords[nPlayer].Y + 30 * i, 90, 130);
+                    playerCoords[nPlayer].X, playerCoords[nPlayer].Y + 30 * i, 90, 130);
+            }
         }
 
 
@@ -85,12 +104,19 @@ namespace Blackjack
             
             Pen whitePen = new Pen(Color.White, 3);
             Brush whiteBrush = new SolidBrush(Color.White);
-            Font textFont = new Font("Broadway", 15);
+            Brush yellowBrush = new SolidBrush(Color.Yellow);
+            Font textFont = new Font("Arial", 12);
+
             for (int i = 0; i < 7; i++)
             {
-                g.DrawRectangle(whitePen, cardsCoords[i].X, cardsCoords[i].Y, 90, 130);
-                g.DrawString(game.GetPlayer(i).Name, textFont, whiteBrush, 30 + 105 * i, 230);
-                g.DrawString(game.GetPlayer(i).Money + " $", textFont, whiteBrush, 30 + 105 * i, 252);
+                g.DrawRectangle(whitePen, playerCoords[i].X, playerCoords[i].Y, 90, 130);
+            }
+
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+            {
+                g.DrawString(game.GetPlayer(i).Name, textFont, whiteBrush, 30 + 105 * i, 220);
+                g.DrawString(game.GetPlayer(i).Money + " $", textFont, whiteBrush, 30 + 105 * i, 240);
+                g.DrawString(game.GetPlayer(i).Stake + " $", textFont, yellowBrush, 30 + 105 * i, 260);
 
                 if (game.IsStand(i))
                 {
@@ -110,6 +136,7 @@ namespace Blackjack
 
             whitePen.Dispose();
             whiteBrush.Dispose();
+            yellowBrush.Dispose();
             textFont.Dispose();
         }
 
@@ -119,10 +146,13 @@ namespace Blackjack
             for (int i = 0; i < BlackjackGame.DECKS_COUNT; i++)
             {
                 game.GetDeck(i).Shuffle();
-                for (int j = 0; j < game.GetDeck(i).GetCardsNumber(); j+=7)
+                int j = 0;
+                for (; j < game.GetDeck(i).GetCardsNumber(); j+=7)
                 {
-                    g.DrawImage(cardBack, 100 * i + 10 + j/5, 50 + j/7, 90, 130);
+                    g.DrawImage(cardBack, shoesCoords[i].X + j/5, shoesCoords[i].Y + j/7, 90, 130);
                 }
+                shoesCoordsToDraw[i].X = shoesCoords[i].X  + j/5;
+                shoesCoordsToDraw[i].Y = shoesCoords[i].Y +  j/7;
             }
         }
 
@@ -140,20 +170,49 @@ namespace Blackjack
             ShowDealerHand();
 
             // draw the cards of all players
-            for (int i = 0; i < 7; i++ )
+            for (int i = 0; i < game.GetPlayersCount(); i++ )
                 ShowPlayerHand( i );
 
             return dbufBitmap;
         }
 
 
-        public void MoveCardToDealer(int nDeck, int nPlayer)
+        public async void MoveCardToDealer()
         {
+            Random r = new Random();
+            int nDeck = r.Next(4);
+
+            DrawShoes();
+
+            Hand dealerHand = game.GetDealer().PlayerHand;
+            Card card = game.GetDeck( nDeck ).PopCard();
+            dealerHand.AddCard( card );
+
+            //Animate
+            DrawCard( card.getNumber(), shoesCoordsToDraw[nDeck].X, shoesCoordsToDraw[nDeck].Y );
+            DC.DrawImage( dbufBitmap, 0, 0 );
+            await Task.Delay( 1500 );
+
+
+            //DrawCard( card.getNumber(), dealerCoords.X, dealerCoords.Y);
+            ShowDealerHand();
+            DC.DrawImage( dbufBitmap, 0, 0 );
         }
 
 
-        public void MoveCardToPlayer( int nDeck, int nPlayer )
+        public async void MoveCardToPlayer( int nPlayer )
         {
+            int nDeck;
+            Card card = game.PlayerHit( nPlayer, out nDeck );
+
+            //Animate
+            DrawCard(card.getNumber(), shoesCoordsToDraw[nDeck].X, shoesCoordsToDraw[nDeck].Y);
+            DC.DrawImage(dbufBitmap, 0, 0);
+            await Task.Delay(700);
+            DrawShoes();
+
+            ShowPlayerHand( nPlayer );
+            DC.DrawImage(dbufBitmap, 0, 0);
         }
     }
 }
