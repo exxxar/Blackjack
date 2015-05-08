@@ -117,18 +117,9 @@ namespace Blackjack
                 g.DrawString(game.GetPlayer(i).Name, textFont, whiteBrush, 30 + 105 * i, 220);
                 g.DrawString(game.GetPlayer(i).Money + " $", textFont, whiteBrush, 30 + 105 * i, 240);
                 g.DrawString(game.GetPlayer(i).Stake + " $", textFont, yellowBrush, 30 + 105 * i, 260);
-
-                if (game.IsStand(i))
-                {
-                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\stand_fix.jpeg"), 60 + 105 * i, 285, 30, 30);
-                }
-                else
-                {
-                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\hit.jpeg"), 25 + 105 * i, 285, 30, 30);
-                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\stand.jpeg"), 60 + 105 * i, 285, 30, 30);
-                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\double.png"), 95 + 105 * i, 285, 30, 30);
-                }
             }
+
+            DrawOptions();
 
             g.DrawRectangle(whitePen, 500, 50, 90, 130);
             g.DrawRectangle(whitePen, 600, 50, 90, 130);
@@ -141,11 +132,29 @@ namespace Blackjack
         }
 
 
+        private void DrawOptions()
+        {
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+            {
+                if ( game.IsStand(i) )
+                {
+                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\stand_fix.jpeg"), 60 + 105 * i, 285, 30, 30);
+                }
+                else
+                {
+                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\hit.jpeg"), 25 + 105 * i, 285, 30, 30);
+                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\stand.jpeg"), 60 + 105 * i, 285, 30, 30);
+                    g.DrawImage(new Bitmap(@"d:\projects\github\Blackjack\Blackjack\images\double.png"), 95 + 105 * i, 285, 30, 30);
+                }
+            }
+        }
+
         private void DrawShoes()
         {
             for (int i = 0; i < BlackjackGame.DECKS_COUNT; i++)
             {
                 game.GetDeck(i).Shuffle();
+
                 int j = 0;
                 for (; j < game.GetDeck(i).GetCardsNumber(); j+=7)
                 {

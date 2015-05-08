@@ -136,5 +136,14 @@ namespace Blackjack
                 }
             }
         }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F2)
+            {
+                gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
+                game.Shuffle();
+            }
+        }
     }
 }
