@@ -11,9 +11,8 @@ namespace Blackjack
         private IScoreCounter scoreCounter;
 
         protected string name;
-
         protected Hand hand = new Hand();
-
+       
         public CardHolder( string nm = "Unknown" )
         {
             name = nm;
@@ -30,7 +29,8 @@ namespace Blackjack
             get { return hand; }
             set { hand = value; }
         }
-        	    
+
+                	    
 	    public void SetScoreCounter(IScoreCounter scorer)
         {
             scoreCounter = scorer;
@@ -41,7 +41,8 @@ namespace Blackjack
             return scoreCounter.CountScore( hand );
         }
 		 
-	    public void TakeCard( Deck[] decks )
+        /*
+	    public void TakeCardFromTheDeck( Deck[] decks )
         {
             int nDecks = decks.Length;
             Random rand = new Random();
@@ -52,8 +53,20 @@ namespace Blackjack
             int score = scoreCounter.CountScore(hand);
             if (score > 21)
                 throw new BustException(name, score);		// аж здесь бросаем исключение (аккуратно!)
-
         }
+        */
+
+        public void TakeCard( Card card )
+        {
+            hand.AddCard( card );
+
+            int score = scoreCounter.CountScore(hand);
+            if (score == 21)
+                throw new BlackjackException(name);		// аж здесь бросаем исключение (аккуратно!)
+            if (score > 21)
+                throw new BustException(name, score);		// аж здесь бросаем исключение (аккуратно!)
+        }
+
 	
         public void ClearHand()
         {

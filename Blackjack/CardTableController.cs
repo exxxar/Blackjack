@@ -125,6 +125,42 @@ namespace Blackjack
 
             DrawOptions();
 
+            if (game.dealerBlackjack)
+            {
+                Pen redPen = new Pen(Color.Red);
+                Brush blackBrush = new SolidBrush(Color.Black);
+                Brush lightRedBrush = new SolidBrush(Color.LightYellow);
+
+                g.DrawRectangle(redPen, 620, 20, 100, 30);
+                g.FillRectangle(lightRedBrush, 625, 21, 99, 29);
+                g.DrawString("BLACKJACK!", new Font("Stencil", 12), blackBrush, 630, 23);
+
+                redPen.Dispose();
+                blackBrush.Dispose();
+                lightRedBrush.Dispose();
+            }
+
+            if (game.dealerBust)
+            {
+
+                //////////
+
+                Pen redPen = new Pen(Color.Red);
+                Brush blackBrush = new SolidBrush(Color.Black);
+                Brush lightRedBrush = new SolidBrush(Color.LightYellow);
+
+                g.DrawRectangle(redPen, 620, 20, 100, 30);
+                g.FillRectangle(lightRedBrush, 625, 21, 99, 29);
+                g.DrawString("BUST!", new Font("Stencil", 12), blackBrush, 630, 23);
+
+                redPen.Dispose();
+                blackBrush.Dispose();
+                lightRedBrush.Dispose();
+
+                /////////
+            }
+
+
             g.DrawRectangle(whitePen, 500, 50, 90, 130);
             g.DrawRectangle(whitePen, 600, 50, 90, 130);
             g.DrawString("Dealer", textFont, whiteBrush, 560, 20);
@@ -144,13 +180,30 @@ namespace Blackjack
         {
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                if ( game.GetPlayerState(i) == PlayerState.STAND)
+                if (game.dealerBlackjack)
+                {
+                    DrawWin(i);
+                }
+                else if (game.GetPlayer(i).PlayResult != PlayerResult.UNDEFINED)
+                {
+                    switch (game.GetPlayer(i).PlayResult)
+                    {
+                        case PlayerResult.WIN: DrawWin(i); break;
+                        case PlayerResult.LOSE: DrawLose(i); break;
+                        case PlayerResult.TIE: DrawTie(i); break;
+                    }
+                }
+                else if ( game.GetPlayerState(i) == PlayerState.STAND)
                 {
                     g.DrawImage(new Bitmap(Properties.Resources.stand_fix), 60 + 105 * i, 285, 30, 30);
                 }
                 else if (game.GetPlayerState(i) == PlayerState.BUST)
                 {
                     DrawBust( i );
+                }
+                else if (game.GetPlayerState(i) == PlayerState.BLACKJACK)
+                {
+                    DrawBlackjack(i);
                 }
                 else
                 {
@@ -160,6 +213,8 @@ namespace Blackjack
                 }
             }
         }
+
+
 
         private void DrawShoes()
         {
@@ -181,15 +236,79 @@ namespace Blackjack
         public void DrawBust(int nPlayer)
         {
             Pen redPen = new Pen(Color.Red);
-            Brush whiteBrush = new SolidBrush(Color.White);
+            Brush whiteBrush = new SolidBrush(Color.Black);
             Brush lightRedBrush = new SolidBrush(Color.LightCoral);
 
             g.DrawRectangle(redPen, 25 + 105 * nPlayer, 285, 100, 30);
             g.FillRectangle(lightRedBrush, 26 + 105 * nPlayer, 286, 99, 29);
-            g.DrawString("BUST!", new Font("Stencil", 16), whiteBrush, 40 + 105 * nPlayer, 289);
+            g.DrawString("BUST!", new Font("Stencil", 12), whiteBrush, 40 + 105 * nPlayer, 289);
 
             redPen.Dispose();
             whiteBrush.Dispose();
+            lightRedBrush.Dispose();
+        }
+
+
+        public void DrawWin(int nPlayer)
+        {
+            Pen greenPen = new Pen(Color.Green);
+            Brush whiteBrush = new SolidBrush(Color.White);
+            Brush lightGreenBrush = new SolidBrush(Color.LightGreen);
+
+            g.DrawRectangle(greenPen, 25 + 105 * nPlayer, 285, 100, 30);
+            g.FillRectangle(lightGreenBrush, 26 + 105 * nPlayer, 286, 99, 29);
+            g.DrawString(" WIN!", new Font("Stencil", 16), whiteBrush, 40 + 105 * nPlayer, 289);
+
+            greenPen.Dispose();
+            whiteBrush.Dispose();
+            lightGreenBrush.Dispose();
+        }
+
+
+        public void DrawLose(int nPlayer)
+        {
+            Pen redPen = new Pen(Color.Blue);
+            Brush whiteBrush = new SolidBrush(Color.White);
+            Brush lightRedBrush = new SolidBrush(Color.LightBlue);
+
+            g.DrawRectangle(redPen, 25 + 105 * nPlayer, 285, 100, 30);
+            g.FillRectangle(lightRedBrush, 26 + 105 * nPlayer, 286, 99, 29);
+            g.DrawString("LOSE!", new Font("Stencil", 16), whiteBrush, 40 + 105 * nPlayer, 289);
+
+            redPen.Dispose();
+            whiteBrush.Dispose();
+            lightRedBrush.Dispose();
+        }
+
+
+        public void DrawTie(int nPlayer)
+        {
+            Pen redPen = new Pen(Color.Red);
+            Brush blackBrush = new SolidBrush(Color.Black);
+            Brush lightRedBrush = new SolidBrush(Color.LightGoldenrodYellow);
+
+            g.DrawRectangle(redPen, 25 + 105 * nPlayer, 285, 100, 30);
+            g.FillRectangle(lightRedBrush, 26 + 105 * nPlayer, 286, 99, 29);
+            g.DrawString(" TIE!", new Font("Stencil", 16), blackBrush, 40 + 105 * nPlayer, 289);
+
+            redPen.Dispose();
+            blackBrush.Dispose();
+            lightRedBrush.Dispose();
+        }
+
+
+        public void DrawBlackjack(int nPlayer)
+        {
+            Pen redPen = new Pen(Color.Red);
+            Brush blackBrush = new SolidBrush(Color.Black);
+            Brush lightRedBrush = new SolidBrush(Color.LightYellow);
+
+            g.DrawRectangle(redPen, 25 + 105 * nPlayer, 285, 100, 30);
+            g.FillRectangle(lightRedBrush, 26 + 105 * nPlayer, 286, 99, 29);
+            g.DrawString("BLACKJACK!", new Font("Stencil", 12), blackBrush, 32 + 105 * nPlayer, 289);
+
+            redPen.Dispose();
+            blackBrush.Dispose();
             lightRedBrush.Dispose();
         }
 
@@ -224,29 +343,6 @@ namespace Blackjack
 
 
 
-        public /*async*/ void MoveCardToDealer()
-        {
-            Random r = new Random();
-            int nDeck = r.Next(4);
-            
-            Hand dealerHand = game.GetDealer().PlayerHand;
-            Card card = game.GetDeck( nDeck ).PopCard();
-            dealerHand.AddCard( card );
-
-            //Animate
-            DrawCard( card.getNumber(), shoesCoordsToDraw[nDeck].X, shoesCoordsToDraw[nDeck].Y );
-            DC.DrawImage( dbufBitmap, 0, 0 );
-
-            //await Task.Delay( 500 );
-            Thread.Sleep(200);
-
-            DrawShoes();
-
-            ShowDealerHand();
-            DC.DrawImage(dbufBitmap, 0, 0);
-        }
-
-
         public /*async*/ void MoveCardToPlayer( int nPlayer )
         {
             int nDeck;
@@ -257,7 +353,7 @@ namespace Blackjack
             DC.DrawImage(dbufBitmap, 0, 0);
 
             Thread.Sleep( 200 );
-            //await Task.Delay(500);       can't figure out why this doesn't work just like Thread.Sleep()...
+            //await Task.Delay(200);       can't figure out why this doesn't work just like Thread.Sleep()...
             
             DrawShoes();
 
@@ -269,56 +365,91 @@ namespace Blackjack
             {
                 game.SetPlayerState( nPlayer, PlayerState.BUST );
             }
+            catch (BlackjackException bjEx)
+            {
+                game.SetPlayerState(nPlayer, PlayerState.BLACKJACK);
+            }
             finally
             {
                 ShowPlayerHand(nPlayer);
                 DC.DrawImage(dbufBitmap, 0, 0);
             }
+        }
 
+
+        public void MoveCardToDealer()
+        {
+            Random r = new Random();
+            int nDeck = r.Next(4);
+
+            Hand dealerHand = game.GetDealer().PlayerHand;
+            Card card = game.GetDeck(nDeck).PopCard();
+
+            try
+            {
+                game.GetDealer().TakeCard(card);
+            }
+            catch (BustException bjEx)
+            {
+                game.dealerBust = true;
+
+
+
+
+            }
+            catch (BlackjackException bjEx)
+            {
+                game.dealerBlackjack = true;
+            }
+            
+            //Animate
+            DrawCard(card.getNumber(), shoesCoordsToDraw[nDeck].X, shoesCoordsToDraw[nDeck].Y);
+            DC.DrawImage(dbufBitmap, 0, 0);
+
+            Thread.Sleep(200);
+
+            DrawShoes();
+
+            ShowDealerHand();
+            DC.DrawImage(dbufBitmap, 0, 0);
         }
 
         
 
         public void DealerHit()
         {
+            // if all busted no move!
+            int k = 0;
+            for (; k < game.GetPlayersCount(); k++)
+            {
+                if (game.GetPlayerState(k) != PlayerState.BUST)
+                    break;
+            }
+
+            if (k == game.GetPlayersCount())
+                return;
+
+
             for ( int i=0; i<game.GetPlayersCount(); i++ )
             {
                 if (game.GetPlayer(i).PlayerHand.GetCardsNumber() == 2 && game.GetPlayer(i).CountScore() == 21)
                 {
-                    game.DealerHit( i );
-                }
-            }
-
-            if (game.CheckAllBusted())
-            {
-                for (int i = 0; i < game.GetPlayersCount(); i++)
-                {
-                    game.GetPlayer(i).LoseStake();
-                }
-                return;
-            }
-
-            try
-            {
-                for (int i = 0; i < game.GetPlayersCount(); i++)
-                {
-                    game.DealerHit(i);
-
-                    while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
+                    if (game.DealerFirstHit(i) == -1)
                     {
-                        MoveCardToDealer();				            // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
+                        // we won!
+                        game.GetPlayer(i).PlayResult = PlayerResult.WIN;
                     }
                 }
             }
-            catch (BustException bustEx)
+            while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
             {
-                System.Windows.Forms.MessageBox.Show("DEALER BUST!");
+                MoveCardToDealer();				            // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
             }
-
+    
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                game.SetBonuses(i);
-                System.Windows.Forms.MessageBox.Show(game.PlayResults(i).ToString());
+                game.PlayResults(i);
+                DC.DrawImage(GetShowTable() ,0,0);
             }
         }
     }

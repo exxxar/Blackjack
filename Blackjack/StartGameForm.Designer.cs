@@ -196,7 +196,6 @@
             this.DoubleBuffered = true;
             this.MaximizeBox = false;
             this.Name = "StartGameForm";
-            this.Opacity = 0.9D;
             this.Text = "New Shuffle!";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMoney)).EndInit();

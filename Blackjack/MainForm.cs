@@ -40,7 +40,11 @@ namespace Blackjack
                 gamecontroller.MoveCardToPlayer(i);
                 await Task.Delay( 400 );
                 gamecontroller.MoveCardToPlayer(i);
+
+                game.DealerFirstHit(i);
             }
+
+            
         }
 
 
@@ -99,6 +103,9 @@ namespace Blackjack
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ChangePlayers()
         {
 
@@ -160,6 +167,12 @@ namespace Blackjack
                 gamecontroller.DealerHit();
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F2)
@@ -172,12 +185,17 @@ namespace Blackjack
                     makeBetForm.ShowDialog();
                 }
 
-                gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
+                this.Invalidate();
                 GiveTheFirstCards();
             }
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
         {
             Rectangle playerRect = new Rectangle(735, 5, 30, 40);

@@ -41,7 +41,7 @@ namespace Blackjack
             }
         }
 
-	    public void Shuffle( bool bUnpack = false )
+	    public void Shuffle( bool bUnpack = true )
         {
             if ( bUnpack )
                 UnpackNew();
