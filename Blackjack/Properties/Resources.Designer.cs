@@ -63,9 +63,9 @@ namespace Blackjack.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _50a {
+        internal static System.Drawing.Bitmap _double {
             get {
-                object obj = ResourceManager.GetObject("50a", resourceCulture);
+                object obj = ResourceManager.GetObject("_double", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,39 @@ namespace Blackjack.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap hit {
+            get {
+                object obj = ResourceManager.GetObject("hit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap player {
             get {
                 object obj = ResourceManager.GetObject("player", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap stand {
+            get {
+                object obj = ResourceManager.GetObject("stand", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap stand_fix {
+            get {
+                object obj = ResourceManager.GetObject("stand_fix", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

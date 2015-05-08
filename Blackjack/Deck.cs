@@ -41,9 +41,11 @@ namespace Blackjack
             }
         }
 
-	    public void Shuffle()
+	    public void Shuffle( bool bUnpack = false )
         {
-            UnpackNew();
+            if ( bUnpack )
+                UnpackNew();
+
             Random rand = new Random();
             cards = cards.OrderBy(item => rand.Next()).ToList();
         }

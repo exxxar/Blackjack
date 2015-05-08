@@ -109,10 +109,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="images\50a.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="images\casino-chips-md.png" />
+    <Content Include="images\double.png" />
+    <Content Include="images\hit.jpeg" />
+    <Content Include="images\stand.jpeg" />
+    <Content Include="images\stand_fix.jpeg" />
+    <None Include="Resources\hit.bmp" />
     <None Include="images\player.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

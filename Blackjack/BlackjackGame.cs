@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
+    
+
     public class BlackjackGame: ICardGame
     {
         // The number of decks is 4
@@ -16,9 +18,11 @@ namespace Blackjack
         protected CardHolder dealer = new CardHolder("Dealer");		// composite for the dealer
         protected List<Player> players = new List<Player>();		// aggregates the player
         
-        private List<bool> stands = new List<bool>();
+        private List<PlayerState> playerStates = new List<PlayerState>();
 
         IScoreCounter scoreCounter = new BlackjackScoreCounter();
+
+        public bool dealerBlackjack = false;
 
 
 
@@ -34,7 +38,7 @@ namespace Blackjack
         {
             p.SetScoreCounter( scoreCounter );
             players.Add( p );
-            stands.Add( false );
+            playerStates.Add( PlayerState.HIT );
         }
 
         public Player GetPlayer(int pos)
@@ -103,16 +107,14 @@ namespace Blackjack
 	        }
 	        if ( CheckBlackJack( dealer ) )				// если блекджек был у дилера, то просто выводим эту информацию
 	        {
-		        //std::cout << dealer->getName() << " Blackjack!" << std::endl;
+            //    throw new BlackjackException();
+                dealerBlackjack = true;
 	        }
         }
 
 	    public bool CheckBlackJack( CardHolder cardHolder )
         {
-            if (cardHolder.CountScore() == 21)
-                throw new BlackjackException();
-
-            return false;
+            return (cardHolder.CountScore() == 21);
         }
 	
         public bool Check777( CardHolder cardHolder )
@@ -128,147 +130,42 @@ namespace Blackjack
 
             return false;
         }
-	
-        public void PlayerWins( int nPlayer )
+
+
+
+        public Card ChooseCard( out int nDeck )
         {
-            players[ nPlayer ].WinStake();
-        }
-
-        public void DealerWins( int nPlayer )
-        {
-            players[ nPlayer ].LoseStake();
-        }
-
-
-        public void DealerActions()
-        {
-            char choice = '0';
-
-	        if ( CheckBlackJack( players[0] ) )		// самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
-	        {
-		        // тут еще проверка, что и у дилера может оказаться первой карта ценой 10 или 11
-		        // (но это нужно только для случая 2 карт у игрока в хэнде)
-
-		        if ( players[0].PlayerHand.GetCardsNumber() == 2 )
-		        {
-			        if ( dealer.CountScore() >= 10 )
-			        {
-				        if ( dealer.CountScore() == 11 )		// если у дилера туз, то можно предложить игроку 2 таких варианта:
-				        {
-					        do
-					        {
-						        //std::cout << "1. Take the winning 1 to 1" << std::endl;
-						        //std::cout << "2. Keep playing" << std::endl;
-						        //std::cin >> choice;
-					        }
-					        while ( choice != '1'  && choice != '2' );
-
-					        if ( choice == '1' )				// можно просто взять выигрыш сразу (а если нет, то омжет быть выигрыш 3 к 2 (если у дилера не будет блекджека)
-					        {
-						        players[0].WinStake();
-						        return;							// и в этом случае сразу выходим отсюда
-					        }
-				        }
-			        }
-			        else
-			        {
-				        return;				// если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает
-			        }
-		        }
-	        }
-
-	        while ( dealer.CountScore() < 17 )			// дилер здесь добирает карты, пока у него нет 17
-	        {
-		        dealer.TakeCard( decks );				// здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
-	        }
+            Random r = new Random();
+            nDeck = r.Next(4);
+            return decks[nDeck].PopCard();
         }
 
 
         public void Shuffle()
         {
- 	        players[0].Stake = 1000;
+            dealer.ClearHand();				// обнулим хэнды
 
-
-	        dealer.ClearHand();				// обнулим хэнды
-	        players[0].ClearHand();
+            for (int i=0; i<players.Count; i++ )
+            {
+                players[i].ClearHand();
+                SetPlayerState( i, PlayerState.HIT );
+            }
 
                                             // перемешаем случайно все колоды в шузах
             foreach (Deck d in decks)
 		        d.Shuffle();
-		
-	        dealer.TakeCard( decks );		// дилер дает себе 1 карту
-		
-	        players[0].TakeCard( decks );		    // игроку даются 2 карты
-	        players[0].TakeCard( decks );
-
-
-	        try			// блок try здесь, потому что перебор может произойти в любой момент времени как у игрока, так у дилера
-	        {
-		        // главный цикл, пока игрок не нажмет "Хватит" или у него не соберется 21
-		        while ( choice != '2' && players[0].CountScore() != 21 )	
-		        {
-			        char thirdOption = '1';					// здесь третья опция (дабл) будет появляться только тогда, когда у игрока 
-			        if ( players[0].CanDoubleStake() )			// достаточно денег, чтобы удвоить ставку. Иначе - третьей опции (дабл) не будет.
-				        thirdOption = '3';
-
-			        do	
-			        {
-				        //std::cout << "1. Hit" << std::endl;				// предлагаем стандартные опции + дабл (возможно)
-				        //std::cout << "2. Stand" << std::endl;
-				        if ( players[0].CanDoubleStake() )
-                            ;//std::cout << "3. Double" << std::endl;
-					
-				        //std::cin >> choice;
-			        }
-			        while ( choice != '1'  && choice != '2' && choice != thirdOption );
-
-			        switch ( choice )
-			        {
-				        case '3':
-					        players[0].BonusStake( 2 );		// удвоить ставку, если это возможно
-                            break;
-
-				        case '1':
-					        players[0].TakeCard( decks );   // взять одну карту
-					        break;
-			        }
-		        }
-
-		        DealerActions();				// имитация действий дилера
-
-		        PlayResults();					// сформировать результаты игры
-	        }
-		
-	        catch (BustException bustEx)		// если у кого-то произошел перебор, мгновенно управление передается сюда
-	        {
-		        if ( bustEx.PlayerName == dealer.Name )		// если перебор у дилера, то:
-		        {
-			        SetBonuses();					// назначаем бонусы игроку (если был перебор дилера при блекджеке игрока)
-			        PlayerWins();					// и игрок выигрывает, отдаем ему его ставку + , возможно, бонусы
-		        }
-		        else								// если перебор у игрока
-		        {
-			        DealerWins();					// то забираем у него ставку
-		        }
-	        }
         }
 
 
-        public Card PlayerHit( int nPlayer, out int nDeck )
+        public void PlayerHit( int nPlayer, Card card )
         {
-            Random r = new Random();
-
-            nDeck = r.Next(4);
-            Card card = decks[ nDeck ].PopCard();
             players[ nPlayer ].PlayerHand.AddCard( card );
 
-            return card;
+            if (players[nPlayer].CountScore() > 21)
+                throw new BustException( players[nPlayer].Name, players[nPlayer].CountScore() );
         }
 
-        public void PlayerStand( int nPlayer )
-        {
-            stands[nPlayer] = true;
-        }
+        
 
         public void PlayerDouble( int nPlayer )
         {
@@ -278,9 +175,69 @@ namespace Blackjack
                 throw new InvalidOperationException();
         }
 
-        public bool IsStand(int nPlayer)
+
+        public bool CheckAllBusted()
         {
-            return stands[ nPlayer ];
+            for (int i = 0; i < players.Count; i++)
+                if ( GetPlayerState(i) != PlayerState.BUST )
+                    return false;
+
+            return true;
+        }
+
+
+        public bool CheckStates()
+        {
+            for (int i = 0; i < players.Count; i++)
+                if (GetPlayerState(i) != PlayerState.BUST && GetPlayerState(i) != PlayerState.STAND)
+                    return false;
+
+            return true;
+        }
+
+
+        public void SetPlayerState( int nPlayer, PlayerState state )
+        {
+            playerStates[nPlayer] = state;
+        }
+
+
+        public PlayerState GetPlayerState(int nPlayer)
+        {
+            return playerStates[ nPlayer ];
+        }
+
+
+        public void DealerHit( int nPlayer )
+        {
+            //for (int i=0; i<players.Count; i++)
+            if (CheckBlackJack(players[nPlayer]))		// самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
+            {
+                // тут еще проверка, что и у дилера может оказаться первой карта ценой 10 или 11
+                // (но это нужно только для случая 2 карт у игрока в хэнде)
+
+                if (players[nPlayer].PlayerHand.GetCardsNumber() == 2)
+                {
+                    if (dealer.CountScore() >= 10)
+                    {
+                        if (dealer.CountScore() == 11)		// если у дилера туз, то можно предложить игроку 2 таких варианта:
+                        {
+                            System.Windows.Forms.DialogResult res = 
+                                        System.Windows.Forms.MessageBox.Show("1", players[nPlayer].Name + " what?", System.Windows.Forms.MessageBoxButtons.YesNo);
+                                    
+                            if (res == System.Windows.Forms.DialogResult.Yes)		// можно просто взять выигрыш сразу (а если нет, то омжет быть выигрыш 3 к 2 (если у дилера не будет блекджека)
+                            {
+                                players[ nPlayer ].WinStake();
+                                return;							                    // если берем, то в этом случае сразу выходим отсюда
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return;				// если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает
+                    }
+                }
+            }
         }
     }
 }
