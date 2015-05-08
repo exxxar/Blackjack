@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class BustException : BlackjackException
+    public class BustException : BlackjackException
     {
         private string playerName;
         private int score;

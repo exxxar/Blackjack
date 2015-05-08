@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class BlackjackException: InvalidOperationException
+    public class BlackjackException: InvalidOperationException
     {
         protected string message;
 

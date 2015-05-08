@@ -31,14 +31,5 @@ namespace Blackjack
         {
             cards.Clear();
         }
-
-        public void Show()
-        {
-            foreach (Card card in cards)
-            {
-                card.Show( null );
-            }
-        }
-
     }
 }

@@ -11,20 +11,20 @@ namespace Blackjack
     {
         // The number of decks is 4
         public const int DECKS_COUNT = 4;
+        protected Deck[] decks = new Deck[DECKS_COUNT];	            // Shoes, DECKS_COUNT decks
 
-        protected List<Player> players = new List<Player>();			// aggregates the player
+        protected CardHolder dealer = new CardHolder("Dealer");		// composite for the dealer
+        protected List<Player> players = new List<Player>();		// aggregates the player
+        
         private List<bool> stands = new List<bool>();
 
-	    protected CardHolder dealer = new CardHolder( "Dealer" );			// composite for the dealer
+        IScoreCounter scoreCounter = new BlackjackScoreCounter();
 
-	    protected Deck[] decks = new Deck [DECKS_COUNT];	// Shoes, DECKS_COUNT decks
-
-        
 
 
         public BlackjackGame()
         {
-            dealer.SetScoreCounter( new BlackjackScoreCounter() );
+            dealer.SetScoreCounter( scoreCounter );
 
             for (int i = 0; i < DECKS_COUNT; i++)
                 decks[i] = new Deck();
@@ -32,7 +32,7 @@ namespace Blackjack
 	
 	    public void addPlayer( Player p )
         {
-            p.SetScoreCounter( new BlackjackScoreCounter() );
+            p.SetScoreCounter( scoreCounter );
             players.Add( p );
             stands.Add( false );
         }
@@ -57,64 +57,47 @@ namespace Blackjack
             return players.Count;
         }
 
-        // показать игровой стол:
-        //		- сколько карт в каждой колоде
-        //		- хэнд дилера
-        //		- хэнд игрока
 
-	    public void ShowTable()
+	    public int PlayResults( int nPlayer )
         {
-            //std::cout << std::endl;
-
-	        //for ( int i=0; i<4; i++ )
-		    //    std::cout << "[" << decks[i].getCardsNumber() << "]  ";
-		
-	        //std::cout << std::endl;
-		
-	        dealer.ShowHand();
-
-            foreach ( Player p in players )
-	            p.ShowHand();
-        }
-
-
-	    public void PlayResults()
-        {
-            SetBonuses();			// сначала проверим и начислим, если нужно, бонусы игроку
-									
-														// далее обычное сравнение по очкам
-	        if ( players[0].CountScore() < dealer.CountScore() )
+            SetBonuses( nPlayer );			// сначала проверим и начислим, если нужно, бонусы игроку
+									        // далее обычное сравнение по очкам
+            // DEALER WINS
+	        if ( players[ nPlayer ].CountScore() < dealer.CountScore() )
 	        {
-		        DealerWins();
+                players[ nPlayer ].LoseStake();
+                return -1;
 	        }
-	        else if ( players[0].CountScore() == dealer.CountScore() )
+            // PLAYER WINS
+	        else if ( players[ nPlayer ].CountScore() > dealer.CountScore() )
 	        {
-		        //std::cout << std::endl << "Tie!" << std::endl;
+                players[ nPlayer ].WinStake();
+                return 1;
 	        }
-	        else if ( players[0].CountScore() > dealer.CountScore() )
-	        {
-		        PlayerWins();
-	        }
+            // TIE
+            else
+            {
+                return 0;
+            }
         }
 
 	    
-	    public void SetBonuses()
+	    public void SetBonuses( int nPlayer )
         {
-            if ( CheckBlackJack( players[0] ) )				// отдельно рассматриваем случаи с блекджеком (там другие правила начисления выигрыша)
+            if ( CheckBlackJack( players[ nPlayer ] ) )				// отдельно рассматриваем случаи с блекджеком (там другие правила начисления выигрыша)
 	        {
 		        if ( !CheckBlackJack( dealer ) )					    // если при блекджеке игрока нет блекджека дилера,
 		        {													    // то еще проверяем, по сколько у них карт:
 			        if ( dealer.PlayerHand.GetCardsNumber() > 1 )	    // если у дилера больше 1 карты, т.е. он пытался добрать карты, чтобы "перебить" блекджек игрока	
-				        players[0].BonusStake( 1.5 );					// то выигрыш игрока должен быть 3 к 2 
+                        players[nPlayer].BonusStake(1.5);					// то выигрыш игрока должен быть 3 к 2 
 
 			        else if ( dealer.PlayerHand.GetCardsNumber() == 1				    // также есть особая ситуация в самом начале (с раздачи):
-						        && players[0].PlayerHand.GetCardsNumber() == 2 )		// у дилера 1 карта, у игрока - 2
-				        players[0].BonusStake( 1.5 );									// в таком случае тоже выигрыш игрока равен 3 к 2
+                                && players[nPlayer].PlayerHand.GetCardsNumber() == 2)		// у дилера 1 карта, у игрока - 2
+                        players[ nPlayer ].BonusStake(1.5);									// в таком случае тоже выигрыш игрока равен 3 к 2
 
-			        if ( Check777( players[0] ) == true )				// еще если три семерки, доп. выигрыш игроку (1 к 1)
+                    if (Check777(players[ nPlayer ]) == true)				// еще если три семерки, доп. выигрыш игроку (1 к 1)
 			        {
-				        //std::cout << "777!" << std::endl;
-				        players[0].BonusStake( 2 );
+                        players[ nPlayer ].BonusStake(2);
 			        }
 		        }
 	        }
@@ -126,7 +109,10 @@ namespace Blackjack
 
 	    public bool CheckBlackJack( CardHolder cardHolder )
         {
-            return cardHolder.CountScore() == 21;
+            if (cardHolder.CountScore() == 21)
+                throw new BlackjackException();
+
+            return false;
         }
 	
         public bool Check777( CardHolder cardHolder )
@@ -143,18 +129,14 @@ namespace Blackjack
             return false;
         }
 	
-        public void PlayerWins()
+        public void PlayerWins( int nPlayer )
         {
-            //std::cout << std::endl << player->getName() << " wins!" << std::endl;
-	        //std::cout << "The winning size: " << player->getStake() << std::endl;
-	        players[0].WinStake();
+            players[ nPlayer ].WinStake();
         }
 
-        public void DealerWins()
+        public void DealerWins( int nPlayer )
         {
-            //std::cout << std::endl << player->getName() << " loses!" << std::endl;
-	        //std::cout << "Losing size: " << player->getStake() << std::endl;
-	        players[0].LoseStake();
+            players[ nPlayer ].LoseStake();
         }
 
 
@@ -164,8 +146,6 @@ namespace Blackjack
 
 	        if ( CheckBlackJack( players[0] ) )		// самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
 	        {
-		        //std::cout << player->getName() << " Blackjack!" << std::endl;
-
 		        // тут еще проверка, что и у дилера может оказаться первой карта ценой 10 или 11
 		        // (но это нужно только для случая 2 карт у игрока в хэнде)
 
@@ -201,25 +181,12 @@ namespace Blackjack
 	        {
 		        dealer.TakeCard( decks );				// здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
 	        }
-
-	        ShowTable();
         }
 
 
         public void Shuffle()
         {
-            char choice = '0';
-	        int stake = 0;
-
-        	do
-	        {
-		        //std::cout << "Your bet?" << std::endl;
-		        //std::cin >> stake;
-                stake = 200;
-	        }
-	        while ( stake < 100 || stake > players[0].Money );
-
-	        players[0].Stake = stake;
+ 	        players[0].Stake = 1000;
 
 
 	        dealer.ClearHand();				// обнулим хэнды
@@ -233,8 +200,6 @@ namespace Blackjack
 		
 	        players[0].TakeCard( decks );		    // игроку даются 2 карты
 	        players[0].TakeCard( decks );
-				
-	        ShowTable();					// показываем ситуацию на игровом столе после раздачи
 
 
 	        try			// блок try здесь, потому что перебор может произойти в любой момент времени как у игрока, так у дилера
@@ -265,7 +230,6 @@ namespace Blackjack
 
 				        case '1':
 					        players[0].TakeCard( decks );   // взять одну карту
-					        ShowTable();					// показать ситуацию на игровом столе после взятия карты
 					        break;
 			        }
 		        }
@@ -277,10 +241,6 @@ namespace Blackjack
 		
 	        catch (BustException bustEx)		// если у кого-то произошел перебор, мгновенно управление передается сюда
 	        {
-		        ShowTable();					// показываем игровой стол (чтобы видеть, у кого случился перебор)
-
-		        //std::cout << ex.getPlayerName() << " : " << ex.what() << std::endl;		// пишем у кого перебор
-				
 		        if ( bustEx.PlayerName == dealer.Name )		// если перебор у дилера, то:
 		        {
 			        SetBonuses();					// назначаем бонусы игроку (если был перебор дилера при блекджеке игрока)
@@ -291,8 +251,6 @@ namespace Blackjack
 			        DealerWins();					// то забираем у него ставку
 		        }
 	        }
-
-	        //players[0].ShowMoney();			// показываем что там у игрока с фишками (деньгами) в целом после этой игры
         }
 
 
@@ -322,7 +280,7 @@ namespace Blackjack
 
         public bool IsStand(int nPlayer)
         {
-            return stands[nPlayer];
+            return stands[ nPlayer ];
         }
     }
 }

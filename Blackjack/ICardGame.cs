@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    interface ICardGame
+    public interface ICardGame
     {
         void Shuffle();
-	    void ShowTable();
-        void PlayResults(); 
+        int PlayResults( int nPlayer ); 
     }
 }

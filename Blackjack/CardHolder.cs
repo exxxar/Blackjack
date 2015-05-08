@@ -59,10 +59,5 @@ namespace Blackjack
         {
             hand.Clear();
         }
-
-	    public void ShowHand()
-        {
-            hand.Show();
-        }
     }
 }

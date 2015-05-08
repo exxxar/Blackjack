@@ -43,7 +43,7 @@ namespace Blackjack
 
 	    public void Shuffle()
         {
-            //UnpackNew();
+            UnpackNew();
             Random rand = new Random();
             cards = cards.OrderBy(item => rand.Next()).ToList();
         }

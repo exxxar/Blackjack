@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class BlackjackScoreCounter: IScoreCounter
+    public class BlackjackScoreCounter: IScoreCounter
     {
         public byte CountScore(Hand hand)
         {
