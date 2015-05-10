@@ -40,29 +40,17 @@ namespace Blackjack
         {
             return scoreCounter.CountScore( hand );
         }
-		 
-        /*
-	    public void TakeCardFromTheDeck( Deck[] decks )
-        {
-            int nDecks = decks.Length;
-            Random rand = new Random();
 
-            Card cardOutOfDeck = decks[rand.Next(nDecks)].PopCard();
-            hand.AddCard(cardOutOfDeck);
-
-            int score = scoreCounter.CountScore(hand);
-            if (score > 21)
-                throw new BustException(name, score);		// аж здесь бросаем исключение (аккуратно!)
-        }
-        */
 
         public void TakeCard( Card card )
         {
             hand.AddCard( card );
 
             int score = scoreCounter.CountScore(hand);
+
             if (score == 21)
                 throw new BlackjackException(name);		// аж здесь бросаем исключение (аккуратно!)
+
             if (score > 21)
                 throw new BustException(name, score);		// аж здесь бросаем исключение (аккуратно!)
         }

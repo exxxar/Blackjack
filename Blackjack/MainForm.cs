@@ -29,28 +29,6 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
-        private async void GiveTheFirstCards()
-        {
-            await Task.Delay( 400 );
-            gamecontroller.MoveCardToDealer();
-
-            for (int i = 0; i < game.GetPlayersCount(); i++)
-            {
-                await Task.Delay( 400 );
-                gamecontroller.MoveCardToPlayer(i);
-                await Task.Delay( 400 );
-                gamecontroller.MoveCardToPlayer(i);
-
-                game.DealerFirstHit(i);
-            }
-
-            
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
@@ -71,7 +49,7 @@ namespace Blackjack
                 gamecontroller = new CardTableController(game);
 
                 gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
-                GiveTheFirstCards();
+                gamecontroller.GiveTheFirstCards();
             }
             else
             {
@@ -108,7 +86,8 @@ namespace Blackjack
         /// </summary>
         private void ChangePlayers()
         {
-
+            PlayersForm form = new PlayersForm();
+            form.ShowDialog();
         }
 
 
@@ -186,7 +165,7 @@ namespace Blackjack
                 }
 
                 this.Invalidate();
-                GiveTheFirstCards();
+                gamecontroller.GiveTheFirstCards();
             }
         }
 

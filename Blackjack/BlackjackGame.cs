@@ -229,10 +229,7 @@ namespace Blackjack
         /// <param name="card"></param>
         public void PlayerHit( int nPlayer, Card card )
         {
-            players[ nPlayer ].PlayerHand.AddCard( card );
-
-            if (players[nPlayer].CountScore() > 21)
-                throw new BustException( players[nPlayer].Name, players[nPlayer].CountScore() );
+            players[nPlayer].TakeCard( card );
         }
 
         
@@ -253,25 +250,12 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool CheckAllBustedOrWon()
-        {
-            for (int i = 0; i < players.Count; i++)
-                if ( GetPlayerState(i) != PlayerState.BUST || players[i].PlayResult != PlayerResult.WIN )
-                    return false;
-
-            return true;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public bool CheckStates()
         {
             for (int i = 0; i < players.Count; i++)
-                if (GetPlayerState(i) != PlayerState.BUST && GetPlayerState(i) != PlayerState.STAND)
-                //if ( players[i].PlayResult == PlayerResult.UNDEFINED )
+                if (GetPlayerState(i) != PlayerState.BUST &&
+                    GetPlayerState(i) != PlayerState.STAND &&
+                    GetPlayerState(i) != PlayerState.BLACKJACK)
                     return false;
 
             return true;
@@ -324,7 +308,7 @@ namespace Blackjack
                         {
                             // можно просто взять выигрыш сразу (а если нет, то может быть выигрыш 3 к 2 (если у дилера не будет блекджека)
                             System.Windows.Forms.DialogResult res = 
-                                        System.Windows.Forms.MessageBox.Show("1", players[nPlayer].Name + " what?", System.Windows.Forms.MessageBoxButtons.YesNo);
+                                        System.Windows.Forms.MessageBox.Show("1-to-1?", players[nPlayer].Name + " what?", System.Windows.Forms.MessageBoxButtons.YesNo);
 
                             // если берем, то в этом случае сразу выходим отсюда
                             if (res == System.Windows.Forms.DialogResult.Yes)		
@@ -336,7 +320,8 @@ namespace Blackjack
                     }
                     else
                     {
-                        // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает
+                        // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
+                        players[nPlayer].PlayResult = PlayerResult.WIN;
                         return -1;				
                     }
                 }

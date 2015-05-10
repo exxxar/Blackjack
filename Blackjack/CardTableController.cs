@@ -61,6 +61,8 @@ namespace Blackjack
         }
 
 
+
+
         public void PrepareGraphics(int w, int h, Graphics realGraphics)
         {
             DC = realGraphics;
@@ -102,10 +104,9 @@ namespace Blackjack
         public void DrawTable()
         {
             g.FillRectangle(new LinearGradientBrush(new Point(0, 0), new Point(dbufBitmap.Width, dbufBitmap.Height),
-                                                                        Color.LightGreen, Color.DarkGreen),
-                                                   0, 0, dbufBitmap.Width, dbufBitmap.Height);
+                                                                            Color.LightGreen, Color.DarkGreen),
+                                                                            0, 0, dbufBitmap.Width, dbufBitmap.Height);
 
-            
             Pen whitePen = new Pen(Color.White, 3);
             Brush whiteBrush = new SolidBrush(Color.White);
             Brush yellowBrush = new SolidBrush(Color.Yellow);
@@ -182,7 +183,7 @@ namespace Blackjack
             {
                 if (game.dealerBlackjack)
                 {
-                    DrawWin(i);
+                    DrawLose(i);
                 }
                 else if (game.GetPlayer(i).PlayResult != PlayerResult.UNDEFINED)
                 {
@@ -214,8 +215,7 @@ namespace Blackjack
             }
         }
 
-
-
+        
         private void DrawShoes()
         {
             for (int i = 0; i < BlackjackGame.DECKS_COUNT; i++)
@@ -230,8 +230,7 @@ namespace Blackjack
                 shoesCoordsToDraw[i].Y = shoesCoords[i].Y +  j/7;
             }
         }
-
-
+        
 
         public void DrawBust(int nPlayer)
         {
@@ -312,8 +311,7 @@ namespace Blackjack
             lightRedBrush.Dispose();
         }
 
-
-
+        
         public Bitmap GetShowTable()
         {
             // draw the entire table
@@ -340,10 +338,31 @@ namespace Blackjack
 
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public async void GiveTheFirstCards()
+        {
+            await Task.Delay(900);
+            MoveCardToDealer();
+
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+            {
+                await Task.Delay(900);
+                MoveCardToPlayer(i);
+                await Task.Delay(900);
+                MoveCardToPlayer(i);
+
+                game.DealerFirstHit(i);
+                DC.DrawImage(dbufBitmap, 0, 0);
+            }
 
 
+        }
 
-        public /*async*/ void MoveCardToPlayer( int nPlayer )
+
+        //public async void MoveCardToPlayer( int nPlayer )
+        public void MoveCardToPlayer( int nPlayer )
         {
             int nDeck;
             Card card = game.ChooseCard( out nDeck );
@@ -353,7 +372,7 @@ namespace Blackjack
             DC.DrawImage(dbufBitmap, 0, 0);
 
             Thread.Sleep( 200 );
-            //await Task.Delay(200);       can't figure out why this doesn't work just like Thread.Sleep()...
+            //await Task.Delay(1200); //      can't figure out why this doesn't work just like Thread.Sleep()...
             
             DrawShoes();
 
@@ -371,6 +390,7 @@ namespace Blackjack
             }
             finally
             {
+                DrawOptions();
                 ShowPlayerHand(nPlayer);
                 DC.DrawImage(dbufBitmap, 0, 0);
             }
@@ -418,6 +438,19 @@ namespace Blackjack
 
         public void DealerHit()
         {
+            for ( int i=0; i<game.GetPlayersCount(); i++ )
+            {
+                if (game.GetPlayer(i).PlayerHand.GetCardsNumber() == 2 && game.GetPlayer(i).CountScore() == 21)
+                {
+                    if (game.DealerFirstHit(i) == -1)
+                    {
+                        // we won!
+                        game.GetPlayer(i).PlayResult = PlayerResult.WIN;
+                    }
+                }
+            }
+
+
             // if all busted no move!
             int k = 0;
             for (; k < game.GetPlayersCount(); k++)
@@ -430,17 +463,6 @@ namespace Blackjack
                 return;
 
 
-            for ( int i=0; i<game.GetPlayersCount(); i++ )
-            {
-                if (game.GetPlayer(i).PlayerHand.GetCardsNumber() == 2 && game.GetPlayer(i).CountScore() == 21)
-                {
-                    if (game.DealerFirstHit(i) == -1)
-                    {
-                        // we won!
-                        game.GetPlayer(i).PlayResult = PlayerResult.WIN;
-                    }
-                }
-            }
             while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
             {
                 MoveCardToDealer();				            // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
@@ -449,7 +471,7 @@ namespace Blackjack
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 game.PlayResults(i);
-                DC.DrawImage(GetShowTable() ,0,0);
+                DC.DrawImage(GetShowTable() , 0, 0);
             }
         }
     }
