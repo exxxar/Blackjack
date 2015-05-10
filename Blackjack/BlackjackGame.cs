@@ -289,7 +289,7 @@ namespace Blackjack
         /// </summary>
         /// <param name="nPlayer"></param>
         /// <returns></returns>
-        public int DealerFirstHit( int nPlayer )
+        public void DealerFirstHit( int nPlayer )
         {
             // самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
             if (CheckBlackJack(players[nPlayer]))		
@@ -314,19 +314,17 @@ namespace Blackjack
                             if (res == System.Windows.Forms.DialogResult.Yes)		
                             {
                                 players[ nPlayer ].WinStake();
-                                return -1;							                    
                             }
                         }
                     }
                     else
                     {
                         // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
-                        players[nPlayer].PlayResult = PlayerResult.WIN;
-                        return -1;				
+                        players[nPlayer].BonusStake(1.5);
+                        players[nPlayer].WinStake();
                     }
                 }
             }
-            return 0;
         }
     }
 }

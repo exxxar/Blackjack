@@ -181,11 +181,7 @@ namespace Blackjack
         {
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                if (game.dealerBlackjack)
-                {
-                    DrawLose(i);
-                }
-                else if (game.GetPlayer(i).PlayResult != PlayerResult.UNDEFINED)
+                if (game.GetPlayer(i).PlayResult != PlayerResult.UNDEFINED)
                 {
                     switch (game.GetPlayer(i).PlayResult)
                     {
@@ -412,10 +408,6 @@ namespace Blackjack
             catch (BustException bjEx)
             {
                 game.dealerBust = true;
-
-
-
-
             }
             catch (BlackjackException bjEx)
             {
@@ -442,11 +434,7 @@ namespace Blackjack
             {
                 if (game.GetPlayer(i).PlayerHand.GetCardsNumber() == 2 && game.GetPlayer(i).CountScore() == 21)
                 {
-                    if (game.DealerFirstHit(i) == -1)
-                    {
-                        // we won!
-                        game.GetPlayer(i).PlayResult = PlayerResult.WIN;
-                    }
+                    game.DealerFirstHit(i);
                 }
             }
 
