@@ -32,6 +32,7 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.listViewPlayers = new System.Windows.Forms.ListView();
             this.buttonAdd = new System.Windows.Forms.Button();
+
             this.SuspendLayout();
             // 
             // buttonRemove
@@ -75,7 +76,7 @@
             this.listViewPlayers.Location = new System.Drawing.Point(12, 12);
             this.listViewPlayers.MultiSelect = false;
             this.listViewPlayers.Name = "listViewPlayers";
-            this.listViewPlayers.Size = new System.Drawing.Size(755, 450);
+            this.listViewPlayers.Size = new System.Drawing.Size(755, 250);
             this.listViewPlayers.TabIndex = 8;
             this.listViewPlayers.UseCompatibleStateImageBehavior = false;
             this.listViewPlayers.View = System.Windows.Forms.View.Details;
@@ -86,7 +87,8 @@
             this.buttonAdd.FlatAppearance.BorderColor = System.Drawing.Color.Yellow;
             this.buttonAdd.FlatAppearance.BorderSize = 2;
             this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonAdd.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAdd.Font = new System.Drawing.Font("Baskerville Old Face",
+                18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonAdd.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.buttonAdd.Location = new System.Drawing.Point(12, 487);
             this.buttonAdd.Name = "buttonAdd";

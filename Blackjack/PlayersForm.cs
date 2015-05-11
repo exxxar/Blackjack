@@ -12,10 +12,27 @@ namespace Blackjack
 {
     public class BlackjackResult
     {
-        public int shuffleNo = 1;
         public List<string> playerNames = new List<string>();
         public List<PlayerResult> results = new List<PlayerResult>();
         public List<int> stake = new List<int>();
+    }
+
+    public class PlayerStats
+    {
+        List<BlackjackResult> gameResult = new List<BlackjackResult>();
+
+        public void AddShuffleResult()
+        {
+            gameResult.Add( new BlackjackResult() );
+        }
+
+        public void SetPlayerResult( Player p )
+        {
+            int idx = gameResult.Count - 1;
+            gameResult[idx].playerNames.Add( p.Name );
+            gameResult[idx].stake.Add( p.Stake );
+            gameResult[idx].results.Add(p.PlayResult);
+        }
     }
 
     public partial class PlayersForm : Form
@@ -34,21 +51,18 @@ namespace Blackjack
             players.Add( new Player( "Sanya", 20000) );
 
             BlackjackResult res = new BlackjackResult();
-            res.shuffleNo = 1;
             res.playerNames.Add("Tim");
             res.results.Add( PlayerResult.WIN );
             res.stake.Add( 200 );
             results.Add( res );
 
             res = new BlackjackResult();
-            res.shuffleNo = 2;
             res.playerNames.Add("Roma");
             res.results.Add(PlayerResult.WIN);
             res.stake.Add(500);
             results.Add(res);
 
             res = new BlackjackResult();
-            res.shuffleNo = 3;
             res.playerNames.Add("Sanya");
             res.results.Add(PlayerResult.TIE);
             res.stake.Add( 400 );
@@ -85,52 +99,22 @@ namespace Blackjack
             listViewPlayers.Columns.Add( "Name (Money)", 140 );
 
             for (int i = 0; i < results.Count; i++ )
-                listViewPlayers.Columns.Add( "Shuffle" + results[i].shuffleNo, 90 );
+                listViewPlayers.Columns.Add( "Shuffle" + i+1, 90 );
 
             for (int i = 0; i < players.Count; i++ )
             {
                 ListViewItem item = new ListViewItem(string.Format("{0} ({1} $)", players[i].Name, players[i].Money));
 
                 for (int j = 0; j < results.Count; j++)
-                    item.SubItems.Add("");
+                {
+                    if (results[j].playerNames.IndexOf(players[i].Name) == -1)
+                        item.SubItems.Add("");
+                    else
+                        item.SubItems.Add("+" + results[j].stake[0]);
+                }
 
                 this.listViewPlayers.Items.Add(item);
             }
-
-
-            for (int i = 0; i < players.Count; i++)
-            {
-                for (int j = 0; j < results.Count; j++)
-                {
-                    int idx = results[j].playerNames.IndexOf(players[i].Name);
-                    if (idx < 0) break;
-
-                    for (int k=0; k<results.Count; k++ )
-                    {
-                        string sign = (results[j].results[k] == PlayerResult.LOSE) ? "-" : "+";
-                        this.listViewPlayers.Items[idx].SubItems[j].Text = sign + results[j].stake[0]; // ???
-                    }
-                }
-            }
-
-            /*
-            for (int i = 0; i < players.Count; i++)
-            {
-                for (int j = 0; j < results.Count; j++)
-                {
-                    int idx = results[j].playerNames.IndexOf(players[i].Name);
-                    if (idx < 0)
-                        return;
-
-                    string sign = (results[j].results[k] == PlayerResult.LOSE) ? "-" : "+";
-                    listViewPlayers.Items[i].SubItems[results[j].shuffleNo - 1].Text = sign + results[j].stake[k];
-
-                    if (results[j].results[k] == PlayerResult.TIE)
-                    {
-                        listViewPlayers.Items[i].SubItems[results[j].shuffleNo].BackColor = Color.White;
-                    }
-                }
-            }*/
         }
     }
 }

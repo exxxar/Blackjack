@@ -339,9 +339,6 @@ namespace Blackjack
         /// </summary>
         public async void GiveTheFirstCards()
         {
-            await Task.Delay(900);
-            MoveCardToDealer();
-
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 await Task.Delay(900);
@@ -353,7 +350,15 @@ namespace Blackjack
                 DC.DrawImage(dbufBitmap, 0, 0);
             }
 
+            await Task.Delay(900);
+            MoveCardToDealer();
 
+            DC.DrawImage(dbufBitmap, 0, 0);
+
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+            {
+                game.DealerFirstHit(i);
+            }
         }
 
 
@@ -399,11 +404,11 @@ namespace Blackjack
             int nDeck = r.Next(4);
 
             Hand dealerHand = game.GetDealer().PlayerHand;
-            Card card = game.GetDeck(nDeck).PopCard();
+            Card card = game.ChooseCard(out nDeck);
 
             try
             {
-                game.GetDealer().TakeCard(card);
+                game.GetDealer().TakeCard( card );
             }
             catch (BustException bjEx)
             {
@@ -418,7 +423,7 @@ namespace Blackjack
             DrawCard(card.getNumber(), shoesCoordsToDraw[nDeck].X, shoesCoordsToDraw[nDeck].Y);
             DC.DrawImage(dbufBitmap, 0, 0);
 
-            Thread.Sleep(200);
+            Thread.Sleep(500);
 
             DrawShoes();
 
@@ -454,6 +459,7 @@ namespace Blackjack
             while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
             {
                 MoveCardToDealer();				            // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
+                Thread.Sleep(300);
             }
     
             for (int i = 0; i < game.GetPlayersCount(); i++)
