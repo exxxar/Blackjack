@@ -20,7 +20,7 @@ namespace Blackjack
     {
         WIN,
         LOSE,
-        TIE,
+        STAY,
         UNDEFINED
     }
 

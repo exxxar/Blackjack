@@ -118,11 +118,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="images\blackjack_21.png" />
+    <None Include="images\bust.png" />
     <Content Include="images\casino-chips-md.png" />
     <Content Include="images\double.png" />
     <Content Include="images\hit.jpeg" />
     <Content Include="images\stand.jpeg" />
     <Content Include="images\stand_fix.jpeg" />
+    <None Include="Resources\blackjack.bmp" />
     <None Include="Resources\hit.bmp" />
     <None Include="images\player.png" />
   </ItemGroup>

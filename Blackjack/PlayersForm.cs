@@ -19,19 +19,29 @@ namespace Blackjack
 
     public class PlayerStats
     {
-        List<BlackjackResult> gameResult = new List<BlackjackResult>();
+        int curShuffle;
+
+        List<BlackjackResult> gameResults = new List<BlackjackResult>();
+
+        public void AddPlayer( Player p )
+        {
+            // check if a player with this name already exists
+            //...
+
+            gameResults[0].playerNames.Add( p.Name );
+        }
 
         public void AddShuffleResult()
         {
-            gameResult.Add( new BlackjackResult() );
+            gameResults.Add( new BlackjackResult() );
         }
 
         public void SetPlayerResult( Player p )
         {
-            int idx = gameResult.Count - 1;
-            gameResult[idx].playerNames.Add( p.Name );
-            gameResult[idx].stake.Add( p.Stake );
-            gameResult[idx].results.Add(p.PlayResult);
+            int idx = gameResults.Count - 1;
+            gameResults[idx].playerNames.Add( p.Name );
+            gameResults[idx].stake.Add( p.Stake );
+            gameResults[idx].results.Add(p.PlayResult);
         }
     }
 
@@ -64,7 +74,7 @@ namespace Blackjack
 
             res = new BlackjackResult();
             res.playerNames.Add("Sanya");
-            res.results.Add(PlayerResult.TIE);
+            res.results.Add(PlayerResult.STAY);
             res.stake.Add( 400 );
             results.Add(res);
         }
