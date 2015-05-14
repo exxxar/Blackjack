@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    class CardTableController
+    public class CardTableController
     {
         private Graphics DC;
         private Graphics g = null;
@@ -346,9 +346,6 @@ namespace Blackjack
             {
                 game.SetPlayerState(nPlayer, PlayerState.BUST);
                 game.GetPlayer(nPlayer).PlayResult = PlayerResult.LOSE;
-
-                game.totalLose -= game.GetPlayer(nPlayer).Stake;
-                game.GetPlayer(nPlayer).LoseStake();
             }
             catch (BlackjackException)
             {
@@ -420,6 +417,10 @@ namespace Blackjack
 
             if (k == game.GetPlayersCount())
             {
+                for (int i = 0; i < game.GetPlayersCount(); i++)
+                {
+                    game.PlayResults(i);
+                }
                 DC.DrawImage(GetShowTable(), 0, 0);
                 return;
             }

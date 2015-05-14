@@ -29,6 +29,16 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
+        private void ChangePlayers()
+        {
+            PlayersForm form = new PlayersForm();
+            form.ShowDialog();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
@@ -56,42 +66,9 @@ namespace Blackjack
                 Close();
             }
         }
+       
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainForm_Paint(object sender, PaintEventArgs e)
-        {
-            e.Graphics.DrawImage( gamecontroller.GetShowTable(), 0, 0);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainForm_Resize(object sender, EventArgs e)
-        {
-            Graphics DC = CreateGraphics();
-            gamecontroller.PrepareGraphics(this.Width, this.Height, DC);
-            DC.DrawImage( gamecontroller.GetShowTable(), 0, 0 );
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void ChangePlayers()
-        {
-            PlayersForm form = new PlayersForm();
-            form.ShowDialog();
-        }
-
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -110,13 +87,13 @@ namespace Blackjack
             }
             catch (InvalidOperationException)
             {
-                MessageBox.Show( "You've not enough money!" );
+                MessageBox.Show( "You've not enough money to double down!" );
             }
         }
 
 
         /// <summary>
-        /// 
+        /// New game (new shuffle) can be started by user after pressing F@
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -157,6 +134,30 @@ namespace Blackjack
                 CreateGraphics().DrawImage(gamecontroller.GetShowTable(), 0, 0);
                 bPlayerChange = false;
             }
+        }
+        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.DrawImage(gamecontroller.GetShowTable(), 0, 0);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            Graphics DC = CreateGraphics();
+            gamecontroller.PrepareGraphics(this.Width, this.Height, DC);
+            DC.DrawImage(gamecontroller.GetShowTable(), 0, 0);
         }
     }
 }

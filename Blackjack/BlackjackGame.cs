@@ -165,8 +165,11 @@ namespace Blackjack
             // DEALER WINS
 	        if ( players[ nPlayer ].CountScore() < dealer.CountScore() )
 	        {
-                players[ nPlayer ].LoseStake();
-                totalLose -= players[nPlayer].Stake;
+                //if ( GetPlayerState(nPlayer) != PlayerState.BUST )
+                {
+                    players[ nPlayer ].LoseStake();
+                    totalLose -= players[nPlayer].Stake;
+                }
                 return -1;
 	        }
             // PLAYER WINS
@@ -184,7 +187,6 @@ namespace Blackjack
             else
             {
                 players[nPlayer].PlayResult = PlayerResult.STAY;
-                //totalLose -= players[nPlayer].Stake;
                 return 0;
             }
         }
@@ -338,8 +340,7 @@ namespace Blackjack
                             // можно просто взять выигрыш сразу (а если нет, то может быть выигрыш 3 к 2 (если у дилера не будет блекджека)
                             System.Windows.Forms.DialogResult res =
                                         System.Windows.Forms.MessageBox.Show(
-                                        "Dealer's got Ace!",
-                                        players[nPlayer].Name + ", would you like to take your win 1-to-1 or keep playing (in that case the dealer can also have 21 and you'll lose you stake)?",
+                                        players[nPlayer].Name + ", would you like to take your win 1-to-1 or keep playing (in that case the dealer can also have 21 and you'll lose you stake)?",                                        "Dealer's got Ace!",
                                         System.Windows.Forms.MessageBoxButtons.YesNo);
 
                             // если берем, то в этом случае сразу выходим отсюда
