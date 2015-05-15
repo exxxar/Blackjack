@@ -197,14 +197,6 @@ namespace Blackjack
         /// <returns></returns>
 	    public int PlayResults( int nPlayer )
         {
-            switch (players[nPlayer].PlayResult)
-            {
-                case PlayerResult.LOSE: return -1;
-                case PlayerResult.STAY: return 0;               // ? see code in the end of function!!
-                case PlayerResult.WIN: return 1;
-            }
-
-
             // recalculate total lose for casino if some of the players loses
                         
             // first check for player's bust

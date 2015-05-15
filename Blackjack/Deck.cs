@@ -49,15 +49,14 @@ namespace Blackjack
         /// </summary>
 	    public void UnpackNew()
         {
-            Random r = new Random();
-
             cards.Clear();
             for (byte i = 0; i < DECK_SIZE; i++)
             {
                 Card card = new Card();
-                //card.setNumber( i );
+                card.setNumber( i );
 
-                card.setNumber((byte)(r.Next() % 3 + 49) );
+                // for testing blackjacks:
+                //card.setNumber((byte)(r.Next() % 3 + 49) );
 
                 cards.Add( card );
             }
@@ -67,13 +66,12 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="bUnpack"></param>
 	    public void Shuffle()
         {
             UnpackNew();
 
-            Random rand = new Random();
-            cards = cards.OrderBy(item => rand.Next()).ToList();
+            Random rand = new Random( DateTime.Now.Second );
+            cards = cards.OrderBy(item => rand.Next() % 52).ToList();
         }
     }
 }

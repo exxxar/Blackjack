@@ -176,8 +176,10 @@ namespace Blackjack
 
             Pen whitePen = new Pen(Color.White, 3);
             Brush whiteBrush = new SolidBrush(Color.White);
+            Brush blackBrush = new SolidBrush(Color.Black);
             Brush yellowBrush = new SolidBrush(Color.Yellow);
             Font textFont = new Font("Arial", 12);
+            Font gameFont = new Font("Stencil", 16);
 
             for (int i = 0; i < BlackjackGame.MAX_PLAYERS; i++)
             {
@@ -208,6 +210,9 @@ namespace Blackjack
 
             g.DrawImage(Properties.Resources.player, 735, 5, 30, 40);
 
+            g.DrawString("New Game - F2", gameFont, blackBrush, 60, 10);
+
+
             string casinoMoneyString = string.Format("-{0} $", game.totalLose);
             if (game.totalLose < 0)
                 casinoMoneyString = casinoMoneyString.Replace("--", "+");
@@ -216,8 +221,11 @@ namespace Blackjack
 
             whitePen.Dispose();
             whiteBrush.Dispose();
+            blackBrush.Dispose();
             yellowBrush.Dispose();
             textFont.Dispose();
+            gameFont.Dispose();
+
         }
 
 

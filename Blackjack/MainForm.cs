@@ -21,6 +21,9 @@ namespace Blackjack
         CardTableController gamecontroller = null;
         CardTableVisualizer gamevisualizer = null;
 
+        PlayerStats statistics = new PlayerStats();
+        public int curShuffle = 0;
+
         private bool bPlayerChange = false;
         
 
@@ -39,6 +42,7 @@ namespace Blackjack
         private void ChangePlayers()
         {
             PlayersForm form = new PlayersForm();
+            form.gameStats = statistics;
             form.ShowDialog();
         }
 
@@ -50,12 +54,15 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            StartGameForm form = new StartGameForm();
+            //StartGameForm form = new StartGameForm();
+            PlayersForm form = new PlayersForm();
             if (form.ShowDialog() == DialogResult.OK)
             {
+                statistics = form.gameStats;
+
                 game = new BlackjackGame();
 
-                foreach (Player p in form.players)
+                foreach (Player p in form.GetActivePlayers() )
                 {
                     MakeBetForm makeBetForm = new MakeBetForm(p);
                     makeBetForm.ShowDialog();
@@ -68,6 +75,9 @@ namespace Blackjack
 
                 gamecontroller = new CardTableController(game, gamevisualizer);
                 gamecontroller.StartNewShuffle();
+
+                for (int i = 0; i < game.GetPlayersCount(); i++ )
+                    statistics.gameResults.Add(new BlackjackResult( game.GetPlayer(i), curShuffle++) );
             }
             else
             {
@@ -127,6 +137,9 @@ namespace Blackjack
 
                 // ...And start new game
                 gamecontroller.StartNewShuffle();
+
+                for (int i = 0; i < game.GetPlayersCount(); i++)
+                    statistics.gameResults.Add(new BlackjackResult(game.GetPlayer(i), curShuffle++));
             }
         }
 

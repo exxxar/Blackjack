@@ -270,15 +270,6 @@ namespace Blackjack
                 if (standrects[i].Contains(mousePoint) && game.GetPlayerState(i) != PlayerState.BUST)
                 {
                     game.SetPlayerState(i, PlayerState.STAND);
-
-                    if (game.CheckGameFinished())
-                    {
-                        while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
-                        {
-                            MoveCardToDealer(); 	                    // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
-                            Thread.Sleep(300);
-                        }
-                    }
                     cardtable.Invalidate();
                 }
             }

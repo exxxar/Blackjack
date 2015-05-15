@@ -32,7 +32,6 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.listViewPlayers = new System.Windows.Forms.ListView();
             this.buttonAdd = new System.Windows.Forms.Button();
-
             this.SuspendLayout();
             // 
             // buttonRemove
@@ -43,7 +42,7 @@
             this.buttonRemove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRemove.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonRemove.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonRemove.Location = new System.Drawing.Point(225, 487);
+            this.buttonRemove.Location = new System.Drawing.Point(225, 268);
             this.buttonRemove.Name = "buttonRemove";
             this.buttonRemove.Size = new System.Drawing.Size(207, 68);
             this.buttonRemove.TabIndex = 7;
@@ -59,7 +58,7 @@
             this.buttonOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonOK.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonOK.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonOK.Location = new System.Drawing.Point(560, 487);
+            this.buttonOK.Location = new System.Drawing.Point(560, 268);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(207, 68);
             this.buttonOK.TabIndex = 6;
@@ -87,10 +86,9 @@
             this.buttonAdd.FlatAppearance.BorderColor = System.Drawing.Color.Yellow;
             this.buttonAdd.FlatAppearance.BorderSize = 2;
             this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonAdd.Font = new System.Drawing.Font("Baskerville Old Face",
-                18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAdd.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonAdd.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonAdd.Location = new System.Drawing.Point(12, 487);
+            this.buttonAdd.Location = new System.Drawing.Point(12, 268);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(207, 68);
             this.buttonAdd.TabIndex = 9;
@@ -103,11 +101,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LimeGreen;
-            this.ClientSize = new System.Drawing.Size(779, 584);
+            this.ClientSize = new System.Drawing.Size(779, 350);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.listViewPlayers);
             this.Controls.Add(this.buttonRemove);
             this.Controls.Add(this.buttonOK);
+            this.MaximizeBox = false;
             this.Name = "PlayersForm";
             this.Text = "Players Stats";
             this.Load += new System.EventHandler(this.PlayersForm_Load);

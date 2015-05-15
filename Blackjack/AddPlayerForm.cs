@@ -10,28 +10,32 @@ using System.Windows.Forms;
 
 namespace Blackjack
 {
-    public partial class StartGameForm : Form
+    public partial class AddPlayerForm : Form
     {
-        public List<Player> players = new List<Player>();
+        private Player player = null;
 
-        public StartGameForm()
+
+        public AddPlayerForm()
         {
             InitializeComponent();
         }
 
-        public void UpdateViews()
+        public Player GetAddedPlayer()
         {
-            this.listBoxPlayers.Items.Clear();
-
-            foreach (Player p in players)
-                this.listBoxPlayers.Items.Add(
-                    string.Format("{0} ({1})", p.Name, p.Money.ToString()) );
+            return player;
         }
 
         public void buttonAddPlayerClick(object sender, EventArgs e)
         {
-            players.Add(new Player(this.textBoxPlayerName.Text, int.Parse(this.textBoxPlayerMoney.Text)) );
-            UpdateViews();
+            try
+            {
+                player = new Player(this.textBoxPlayerName.Text, int.Parse(this.textBoxPlayerMoney.Text));
+                DialogResult = DialogResult.OK;
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show( "Wrong number format (the money field must contain only digits)" );
+            }
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
