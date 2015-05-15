@@ -76,14 +76,12 @@ namespace Blackjack
 
             //Animate
             cardtable.DrawCard(card, nDeck);
-            
             Thread.Sleep( 300 );
-            
             cardtable.DrawShoes();
 
             try
             {
-                game.PlayerHit(nPlayer, card);
+                game.GetPlayer( nPlayer ).TakeCard(card);
             }
             catch (BustException)
             {
@@ -128,9 +126,7 @@ namespace Blackjack
             
             //Animate
             cardtable.DrawCard(card, nDeck);
-            
             Thread.Sleep(300);
-
             cardtable.DrawShoes();
             cardtable.ShowDealerHand();
             cardtable.Invalidate();
@@ -185,7 +181,7 @@ namespace Blackjack
         public void DealerFirstHit(int nPlayer)
         {
             // самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
-            if (game.CheckBlackJack(game.GetPlayer(nPlayer)))
+            if ( game.CheckBlackJack( game.GetPlayer(nPlayer) ) )
             {
                 game.SetPlayerState(nPlayer, PlayerState.BLACKJACK);
 
@@ -201,41 +197,45 @@ namespace Blackjack
                                         System.Windows.Forms.MessageBox.Show(
                                         game.GetPlayer(nPlayer).Name + ", would you like to take your win 1-to-1 or keep playing " +
                                         "(in that case if the dealer doesn't have blackjack you'll win 3-to-2!)?",
-                                        "Dealer's got Ace!",
+                                        "Dealer's got 10, J, Q, K or A!",
                                         System.Windows.Forms.MessageBoxButtons.YesNo);
 
                         // если берем, то в этом случае сразу выходим отсюда
                         if (res == System.Windows.Forms.DialogResult.Yes)
                         {
+                            game.SetPlayerState(nPlayer, PlayerState.BLACKJACK);
+
                             game.GetPlayer(nPlayer).WinStake();
                             game.totalLose += game.GetPlayer(nPlayer).Stake;
+
+                            // check if it was the last player and others are waiting
+                            //if (game.CheckGameFinished())
+                            if (!game.CheckStates())
+                                DealerHit();
+
                             cardtable.Invalidate();
                         }
                         else
                         {
+                            game.SetPlayerState(nPlayer, PlayerState.STANDBLACKJACK);
+
                             // TODO: check for all stopped playing!!!
-                            if (!game.CheckStates(false))
-                                return;
+                            if (game.CheckStates())
+                            //if (game.CheckGameFinished())
+                                DealerHit();
 
-                            while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
-                            {
-                                MoveCardToDealer(); 	            // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
-                                Thread.Sleep(300);
-                            }
-
-                            for (int i = 0; i < game.GetPlayersCount(); i++)
-                            {
-                                game.PlayResults(i);
-                            }
                             cardtable.Invalidate();
                         }
                     }
                     else
                     {
                         // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
-                        game.GetPlayer(nPlayer).BonusStake();
-                        game.GetPlayer(nPlayer).WinStake();
-                        game.totalLose += game.GetPlayer(nPlayer).Stake;
+                        if (game.GetPlayersCount() == 1)
+                        {
+                            game.GetPlayer(nPlayer).BonusStake();
+                            game.GetPlayer(nPlayer).WinStake();
+                            game.totalLose += game.GetPlayer(nPlayer).Stake;
+                        }
                     }
                 }
             }
@@ -244,6 +244,7 @@ namespace Blackjack
 
 
         #endregion
+
 
 
         /// <summary>
@@ -269,6 +270,15 @@ namespace Blackjack
                 if (standrects[i].Contains(mousePoint) && game.GetPlayerState(i) != PlayerState.BUST)
                 {
                     game.SetPlayerState(i, PlayerState.STAND);
+
+                    if (game.CheckGameFinished())
+                    {
+                        while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
+                        {
+                            MoveCardToDealer(); 	                    // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
+                            Thread.Sleep(300);
+                        }
+                    }
                     cardtable.Invalidate();
                 }
             }

@@ -15,7 +15,8 @@ namespace Blackjack
         STAND,
         DOUBLE,
         BUST,
-        BLACKJACK
+        BLACKJACK,
+        STANDBLACKJACK
     }
 
     /// <summary>

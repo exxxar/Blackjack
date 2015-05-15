@@ -149,15 +149,14 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool CheckStates( bool bWithBlackjack = true)
+        public bool CheckStates()
         {
             for (int i = 0; i < players.Count; i++)
             {
                 if (GetPlayerState(i) != PlayerState.BUST &&
-                    GetPlayerState(i) != PlayerState.STAND)
-                    return false;
-
-                if (!bWithBlackjack && GetPlayerState(i) != PlayerState.BLACKJACK)
+                    GetPlayerState(i) != PlayerState.STAND &&
+                    GetPlayerState(i) != PlayerState.BLACKJACK && 
+                    GetPlayerState(i) != PlayerState.STANDBLACKJACK)
                     return false;
             }
             return true;
@@ -169,9 +168,23 @@ namespace Blackjack
         /// </summary>
         public bool CheckGameFinished()
         {
+            int cnt = 0;
             for (int i = 0; i < players.Count; i++)
-                if (players[i].PlayResult == PlayerResult.UNDEFINED)
+            {
+                //string s = string.Format("{0}\n{1}", players[i].PlayResult, GetPlayerState(i));
+                //System.Windows.Forms.MessageBox.Show(s);
+
+                if (players[i].PlayResult == PlayerResult.UNDEFINED )
                     return false;
+
+                if (GetPlayerState(i) != PlayerState.BUST && 
+                    GetPlayerState(i) != PlayerState.STAND && 
+                    GetPlayerState(i) != PlayerState.BLACKJACK )
+                    cnt++;
+            }
+
+            if (cnt < GetPlayersCount())
+                return false;
 
             return true;
         }
@@ -184,6 +197,14 @@ namespace Blackjack
         /// <returns></returns>
 	    public int PlayResults( int nPlayer )
         {
+            switch (players[nPlayer].PlayResult)
+            {
+                case PlayerResult.LOSE: return -1;
+                case PlayerResult.STAY: return 0;               // ? see code in the end of function!!
+                case PlayerResult.WIN: return 1;
+            }
+
+
             // recalculate total lose for casino if some of the players loses
                         
             // first check for player's bust
@@ -224,7 +245,7 @@ namespace Blackjack
                 if (dealer.PlayerHand.GetCardsNumber() > 1)
                 {
                     players[nPlayer].WinStake();
-                    totalLose += players[nPlayer].Stake;
+                    totalLose += players[ nPlayer ].Stake;
                     return 0;
                 }
                 return 1;
@@ -232,7 +253,8 @@ namespace Blackjack
             // STAY
             else
             {
-                if ( players[nPlayer].PlayResult != PlayerResult.WIN )      // it can happen if afer the 1st dealer hit player already chose win 1-to-1
+                // it can happen if afer the 1st dealer hit player already chose win 1-to-1
+                if ( players[nPlayer].PlayResult != PlayerResult.WIN )      
                     players[nPlayer].PlayResult = PlayerResult.STAY;
                 return 0;
             }
@@ -348,17 +370,6 @@ namespace Blackjack
 		        d.Shuffle();
 
             totalLose = 0;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nPlayer"></param>
-        /// <param name="card"></param>
-        public void PlayerHit( int nPlayer, Card card )
-        {
-            players[nPlayer].TakeCard( card );
         }
     }
 }

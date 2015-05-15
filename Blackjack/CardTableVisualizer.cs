@@ -273,8 +273,6 @@ namespace Blackjack
         {
             for (int i = 0; i < BlackjackGame.DECKS_COUNT; i++)
             {
-                //game.GetDeck(i).Shuffle();
-
                 int j = 0;
                 for (; j < game.GetDeck(i).GetCardsNumber(); j += 7)
                 {

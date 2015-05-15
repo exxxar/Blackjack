@@ -107,7 +107,8 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!game.CheckGameFinished())
+            //if (!game.CheckGameFinished())
+            if (!game.CheckStates())
             {
                 MessageBox.Show("Please wait until the end of current game!");
                 return;
