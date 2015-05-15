@@ -12,14 +12,21 @@ using System.Windows.Forms;
 
 namespace Blackjack
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class MainForm : Form
     {
         BlackjackGame game = null;
         CardTableController gamecontroller = null;
+        CardTableVisualizer gamevisualizer = null;
 
         private bool bPlayerChange = false;
         
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
@@ -56,9 +63,10 @@ namespace Blackjack
                     game.addPlayer(p);
                 }
 
-                gamecontroller = new CardTableController(game);
+                gamevisualizer = new CardTableVisualizer(game);
+                gamevisualizer.PrepareGraphics(this.Width, this.Height, CreateGraphics());
 
-                gamecontroller.PrepareGraphics(this.Width, this.Height, CreateGraphics());
+                gamecontroller = new CardTableController(game, gamevisualizer);
                 gamecontroller.StartNewShuffle();
             }
             else
@@ -99,6 +107,12 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (!game.CheckGameFinished())
+            {
+                MessageBox.Show("Please wait until the end of current game!");
+                return;
+            }
+
             if (e.KeyCode == Keys.F2)
             {
                 for (int i = 0; i < game.GetPlayersCount(); i++)
@@ -123,15 +137,17 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
         {
+            Graphics DC = CreateGraphics();
             Rectangle playerRect = new Rectangle(735, 5, 30, 40);
+
             if (playerRect.Contains(e.Location))
             {
-                CreateGraphics().DrawImage(Properties.Resources.player, 735, 55, 40, 54);
+                DC.DrawImage(Properties.Resources.player, 735, 55, 40, 54);
                 bPlayerChange = true;
             }
             else
             {
-                CreateGraphics().DrawImage(gamecontroller.GetShowTable(), 0, 0);
+                DC.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
                 bPlayerChange = false;
             }
         }
@@ -144,7 +160,7 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawImage(gamecontroller.GetShowTable(), 0, 0);
+            e.Graphics.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
         }
 
 
@@ -156,8 +172,8 @@ namespace Blackjack
         private void MainForm_Resize(object sender, EventArgs e)
         {
             Graphics DC = CreateGraphics();
-            gamecontroller.PrepareGraphics(this.Width, this.Height, DC);
-            DC.DrawImage(gamecontroller.GetShowTable(), 0, 0);
+            gamevisualizer.PrepareGraphics(this.Width, this.Height, DC);
+            DC.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
         }
     }
 }

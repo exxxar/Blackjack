@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class CardHolder
     {
         private IScoreCounter scoreCounter;
@@ -13,35 +16,59 @@ namespace Blackjack
         protected string name;
         protected Hand hand = new Hand();
        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nm"></param>
         public CardHolder( string nm = "Unknown" )
         {
             name = nm;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Name
         {
             get { return name; }
             set { name = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Hand PlayerHand
         {
             get { return hand; }
             set { hand = value; }
         }
 
-                	    
-	    public void SetScoreCounter(IScoreCounter scorer)
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scorer"></param>
+    	public void SetScoreCounter(IScoreCounter scorer)
         {
             scoreCounter = scorer;
         }
 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
 	    public byte CountScore()
         {
             return scoreCounter.CountScore( hand );
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="card"></param>
         public void TakeCard( Card card )
         {
             hand.AddCard( card );
@@ -56,6 +83,9 @@ namespace Blackjack
         }
 
 	
+        /// <summary>
+        /// 
+        /// </summary>
         public void ClearHand()
         {
             hand.Clear();

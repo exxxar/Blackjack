@@ -7,15 +7,21 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    
-
+    /// <summary>
+    /// BlackjackGame class
+    /// </summary>
     public class BlackjackGame: ICardGame
     {
-        // The number of decks is 4
+        /// <summary>
+        /// The number of decks is 4 
+        /// </summary>
         public const int DECKS_COUNT = 4;
         protected Deck[] decks = new Deck[DECKS_COUNT];	            // Shoes, DECKS_COUNT decks
 
-        // The number of players is 7 (tops)
+        
+        /// <summary>
+        /// The number of players is 7 (tops) 
+        /// </summary>
         public const int MAX_PLAYERS = 7;
 
         protected CardHolder dealer = new CardHolder("Dealer");		// composite for the dealer
@@ -25,14 +31,25 @@ namespace Blackjack
 
         IScoreCounter scoreCounter = new BlackjackScoreCounter();
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int totalLose = 0;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public bool dealerBlackjack = false;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public bool dealerBust = false;
 
-
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public BlackjackGame()
         {
             dealer.SetScoreCounter( scoreCounter );
@@ -43,6 +60,11 @@ namespace Blackjack
             totalLose = 0;
         }
 	
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p"></param>
 	    public void addPlayer( Player p )
         {
             p.SetScoreCounter( scoreCounter );
@@ -50,21 +72,43 @@ namespace Blackjack
             playerStates.Add( PlayerState.HIT );
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
         public Player GetPlayer(int pos)
         {
             return players[pos];
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public CardHolder GetDealer()
         {
             return dealer;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
         public Deck GetDeck(int pos)
         {
             return decks[pos];
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public int GetPlayersCount()
         {
             return players.Count;
@@ -105,14 +149,17 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool CheckStates()
+        public bool CheckStates( bool bWithBlackjack = true)
         {
             for (int i = 0; i < players.Count; i++)
+            {
                 if (GetPlayerState(i) != PlayerState.BUST &&
-                    GetPlayerState(i) != PlayerState.STAND &&
-                    GetPlayerState(i) != PlayerState.BLACKJACK)
+                    GetPlayerState(i) != PlayerState.STAND)
                     return false;
 
+                if (!bWithBlackjack && GetPlayerState(i) != PlayerState.BLACKJACK)
+                    return false;
+            }
             return true;
         }
 
@@ -138,8 +185,7 @@ namespace Blackjack
 	    public int PlayResults( int nPlayer )
         {
             // recalculate total lose for casino if some of the players loses
-
-            
+                        
             // first check for player's bust
             if (GetPlayerState(nPlayer) == PlayerState.BUST)
             {
@@ -186,7 +232,8 @@ namespace Blackjack
             // STAY
             else
             {
-                players[nPlayer].PlayResult = PlayerResult.STAY;
+                if ( players[nPlayer].PlayResult != PlayerResult.WIN )      // it can happen if afer the 1st dealer hit player already chose win 1-to-1
+                    players[nPlayer].PlayResult = PlayerResult.STAY;
                 return 0;
             }
         }
@@ -312,55 +359,6 @@ namespace Blackjack
         public void PlayerHit( int nPlayer, Card card )
         {
             players[nPlayer].TakeCard( card );
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nPlayer"></param>
-        /// <returns></returns>
-        public void DealerFirstHit( int nPlayer )
-        {
-            // самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
-            if (CheckBlackJack(players[nPlayer]))		
-            {
-                playerStates[nPlayer] = PlayerState.BLACKJACK;
-
-                // тут еще проверка, что и у дилера может оказаться первой карта ценой 10 или 11
-                // (но это нужно только для случая 2 карт у игрока в хэнде)
-
-                if (players[nPlayer].PlayerHand.GetCardsNumber() == 2)
-                {
-                    if (dealer.CountScore() >= 10)
-                    {
-                        // если у дилера туз, то можно предложить игроку 2 таких варианта:
-                        if (dealer.CountScore() == 11)
-                        {
-                            // можно просто взять выигрыш сразу (а если нет, то может быть выигрыш 3 к 2 (если у дилера не будет блекджека)
-                            System.Windows.Forms.DialogResult res =
-                                        System.Windows.Forms.MessageBox.Show(
-                                        players[nPlayer].Name + ", would you like to take your win 1-to-1 or keep playing (in that case the dealer can also have 21 and you'll lose you stake)?",                                        "Dealer's got Ace!",
-                                        System.Windows.Forms.MessageBoxButtons.YesNo);
-
-                            // если берем, то в этом случае сразу выходим отсюда
-                            if (res == System.Windows.Forms.DialogResult.Yes)
-                            {
-                                players[nPlayer].WinStake();
-                                totalLose += players[nPlayer].Stake;
-                            }
-                        }
-                        // else continue
-                    }
-                    else
-                    {
-                        // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
-                        players[nPlayer].BonusStake();
-                        players[nPlayer].WinStake();
-                        totalLose += players[nPlayer].Stake;
-                    }
-                }
-            }
         }
     }
 }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public enum PlayerState
     {
         HIT,
@@ -16,6 +18,9 @@ namespace Blackjack
         BLACKJACK
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum PlayerResult
     {
         WIN,
@@ -24,7 +29,9 @@ namespace Blackjack
         UNDEFINED
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class Player : CardHolder
     {
         protected int money;
