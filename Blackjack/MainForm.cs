@@ -21,10 +21,13 @@ namespace Blackjack
         CardTableController gamecontroller = null;
         CardTableVisualizer gamevisualizer = null;
 
-        PlayerStats statistics = new PlayerStats();
-        public int curShuffle = 0;
 
-        private bool bPlayerChange = false;
+        PlayerStats statistics = new PlayerStats();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int curShuffle = 0;
         
 
         /// <summary>
@@ -33,17 +36,6 @@ namespace Blackjack
         public MainForm()
         {
             InitializeComponent();
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void ChangePlayers()
-        {
-            PlayersForm form = new PlayersForm();
-            form.gameStats = statistics;
-            form.ShowDialog();
         }
 
 
@@ -62,27 +54,67 @@ namespace Blackjack
 
                 game = new BlackjackGame();
 
-                foreach (Player p in form.GetActivePlayers() )
-                {
-                    MakeBetForm makeBetForm = new MakeBetForm(p);
-                    makeBetForm.ShowDialog();
-
-                    game.addPlayer(p);
-                }
-
                 gamevisualizer = new CardTableVisualizer(game);
                 gamevisualizer.PrepareGraphics(this.Width, this.Height, CreateGraphics());
 
                 gamecontroller = new CardTableController(game, gamevisualizer);
-                gamecontroller.StartNewShuffle();
 
-                for (int i = 0; i < game.GetPlayersCount(); i++ )
-                    statistics.gameResults.Add(new BlackjackResult( game.GetPlayer(i), curShuffle++) );
+                //foreach (var p in form.GetActivePlayers() )
+                //    game.addPlayer( p );
+                game.SetPlayerList( form.GetActivePlayers() );
+
+                NewGame();
             }
             else
             {
                 Close();
             }
+        }
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ChangePlayers()
+        {
+            PlayersForm form = new PlayersForm();
+            form.gameStats = statistics;
+            form.ShowDialog();
+            statistics = form.gameStats;
+
+            game.SetPlayerList( form.GetActivePlayers() );
+
+            if ( form.bChangedPlayer )
+                NewGame();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void NewGame()
+        {
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+            {
+                MakeBetForm makeBetForm = new MakeBetForm(game.GetPlayer(i));
+                makeBetForm.ShowDialog();
+            }
+
+            // Redraw the form
+            this.Invalidate();
+
+
+            //GameIsOver += gamecontroller.GameOver;
+
+
+            // ...And start new game
+            gamecontroller.StartNewShuffle();
+
+            // ... after the game is over
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+                statistics.AddShuffleResult(game.GetPlayer(i), curShuffle);
+            curShuffle++;
         }
        
 
@@ -94,9 +126,18 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_MouseClick(object sender, MouseEventArgs e)
         {
-            if ( bPlayerChange )
+            if (gamevisualizer.bPlayersHighlight)
             {
                 ChangePlayers();
+            }
+            if (gamevisualizer.bNewGameHighlight)
+            {
+                if (!game.CheckStates())
+                {
+                    MessageBox.Show("Please wait until the end of current game!");
+                    return;
+                }
+                NewGame();
             }
 
             try
@@ -117,29 +158,14 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            //if (!game.CheckGameFinished())
-            if (!game.CheckStates())
-            {
-                MessageBox.Show("Please wait until the end of current game!");
-                return;
-            }
-
             if (e.KeyCode == Keys.F2)
             {
-                for (int i = 0; i < game.GetPlayersCount(); i++)
+                if (!game.CheckStates())
                 {
-                    MakeBetForm makeBetForm = new MakeBetForm( game.GetPlayer(i) );
-                    makeBetForm.ShowDialog();
+                    MessageBox.Show("Please wait until the end of current game!");
+                    return;
                 }
-
-                // Redraw the form
-                this.Invalidate();
-
-                // ...And start new game
-                gamecontroller.StartNewShuffle();
-
-                for (int i = 0; i < game.GetPlayersCount(); i++)
-                    statistics.gameResults.Add(new BlackjackResult(game.GetPlayer(i), curShuffle++));
+                NewGame();
             }
         }
 
@@ -153,17 +179,11 @@ namespace Blackjack
         {
             Graphics DC = CreateGraphics();
             Rectangle playerRect = new Rectangle(735, 5, 30, 40);
+            Rectangle newGameRect = new Rectangle(60, 10, 180, 20);
 
-            if (playerRect.Contains(e.Location))
-            {
-                DC.DrawImage(Properties.Resources.player, 735, 55, 40, 54);
-                bPlayerChange = true;
-            }
-            else
-            {
-                DC.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
-                bPlayerChange = false;
-            }
+            gamevisualizer.bPlayersHighlight = (playerRect.Contains( e.Location) ) ? true : false;
+            gamevisualizer.bNewGameHighlight = (newGameRect.Contains(e.Location)) ? true : false;
+            gamevisualizer.Invalidate();
         }
         
 

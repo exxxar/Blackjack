@@ -26,6 +26,9 @@ namespace Blackjack
         public Point[] shoesCoords = new Point[BlackjackGame.DECKS_COUNT];
         public Point[] shoesCoordsToDraw = new Point[BlackjackGame.DECKS_COUNT];
 
+        public bool bPlayersHighlight = false;
+        public bool bNewGameHighlight = false;
+
 
         BlackjackGame game = null;
 
@@ -208,9 +211,23 @@ namespace Blackjack
             g.DrawRectangle(whitePen, 600, 50, 90, 130);
             g.DrawString("Dealer", textFont, whiteBrush, 560, 20);
 
-            g.DrawImage(Properties.Resources.player, 735, 5, 30, 40);
+            if (bPlayersHighlight)
+            {
+                g.DrawImage(Properties.Resources.player, 730, 5, 50, 60);
+            }
+            else
+            {
+                g.DrawImage(Properties.Resources.player, 735, 5, 30, 40);
+            }
 
-            g.DrawString("New Game - F2", gameFont, blackBrush, 60, 10);
+            if (bNewGameHighlight)
+            {
+                g.DrawString("New Game - F2", gameFont, yellowBrush, 60, 10);
+            }
+            else
+            {
+                g.DrawString("New Game - F2", gameFont, blackBrush, 60, 10);
+            }
 
 
             string casinoMoneyString = string.Format("-{0} $", game.totalLose);

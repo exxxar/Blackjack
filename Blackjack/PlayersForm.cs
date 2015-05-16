@@ -16,19 +16,34 @@ namespace Blackjack
     /// </summary>
     public partial class PlayersForm : Form
     {
+        public bool bChangedPlayer = false;
+
         public PlayerStats gameStats { get; set; }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public PlayersForm()
         {
             InitializeComponent();
+
+            gameStats = new PlayerStats();
+        }
+
+
+        private void PlayersForm_Load(object sender, EventArgs e)
+        {
+            ShowStatistics();
         }
 
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.OK;
-            Close();
+            if (listViewPlayers.Items.Count > 0)
+            {
+                DialogResult = DialogResult.OK;
+                Close();
+            }
         }
 
 
@@ -39,6 +54,9 @@ namespace Blackjack
 
             int selIdx = listViewPlayers.SelectedIndices[0];
             listViewPlayers.Items.RemoveAt( selIdx );
+            gameStats.gameResults.RemoveAt( selIdx );
+
+            bChangedPlayer = true;
         }
 
 
@@ -48,27 +66,51 @@ namespace Blackjack
             if (form.ShowDialog() == DialogResult.OK)
             {
                 BlackjackResult res = new BlackjackResult();
-                res.player = form.GetAddedPlayer();
+                res.player = form.GetPlayer();
                 res.results = new List<PlayerResult>();
                 res.shuffles = new List<int>();
                 res.stakes = new List<int>();
 
                 gameStats.gameResults.Add( res );
 
+
+                int nColumns = TotalColumns();
+
+                ListViewItem item = new ListViewItem(string.Format("{0} ({1} $)", form.GetPlayer().Name, form.GetPlayer().Money) );
+                listViewPlayers.Items.Add(item);
+
+                for (int i = 0; i < nColumns; i++)
+                {
+                    item.SubItems.Add("");
+                }
+
                 ShowStatistics();
+
+                bChangedPlayer = true;
             }
         }
 
 
-        private void PlayersForm_Load(object sender, EventArgs e)
+        private void buttonEdit_Click(object sender, EventArgs e)
         {
-            gameStats = new PlayerStats();
+            if (listViewPlayers.SelectedIndices.Count > 0)
+            {
+                int nPlayer = listViewPlayers.SelectedIndices[0];
+                AddPlayerForm form = new AddPlayerForm( PlayerMode.PM_EDIT, gameStats.gameResults[nPlayer].player );
+                form.ShowDialog();
 
-            // get all players from stats!
-            ShowStatistics();
+                string s = string.Format("{0} ({1} $)", form.GetPlayer().Name, form.GetPlayer().Money );
+                listViewPlayers.Items[nPlayer].Text = s;
+
+                bChangedPlayer = true;
+            }
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private int TotalColumns()
         {
             int nColumns = 0;
@@ -86,57 +128,76 @@ namespace Blackjack
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ShowStatistics()
         {
             listViewPlayers.Columns.Clear();
             listViewPlayers.Items.Clear();
 
-            
+
             int nColumns = TotalColumns();
 
 
             listViewPlayers.Columns.Add("Name (Money)", 140);
-            
+
             for (int i = 0; i < nColumns; i++)
+            {
                 listViewPlayers.Columns.Add("Shuffle" + (i + 1), 80);
+            }
+
+            for (int j = 0; j < gameStats.gameResults.Count; j++)
+            {
+                ListViewItem item = new ListViewItem(string.Format("{0} ({1} $)",
+                                                        gameStats.gameResults[j].player.Name,
+                                                        gameStats.gameResults[j].player.Money));
+
+                for (int i = 0; i < nColumns; i++)
+                    item.SubItems.Add("");
+
+                listViewPlayers.Items.Add(item);
+            }
+            
 
             for (int i = 0; i < gameStats.gameResults.Count; i++)
             {
-                ListViewItem item = new ListViewItem(string.Format("{0} ({1} $)", 
-                                                        gameStats.gameResults[i].player.Name,
-                                                        gameStats.gameResults[i].player.Money));
-                
-                int k = 0;
-                int pos = 0;
+                ListViewItem item = listViewPlayers.Items[i];
+
+                int sn = 0;
+
                 foreach (var res in gameStats.gameResults[i].results)
                 {
+                    int shuffleNo = gameStats.gameResults[i].shuffles[sn];
+
                     switch (res)
                     {
                         case PlayerResult.WIN:
-                            item.SubItems[pos].Text = "+" + gameStats.gameResults[i].stakes[k++];
+                            item.SubItems[shuffleNo+1].Text = "+" + gameStats.gameResults[i].stakes[sn];
                             break;
                         case PlayerResult.LOSE:
-                            item.SubItems[pos].Text = "-" + gameStats.gameResults[i].stakes[k++];
+                            item.SubItems[shuffleNo+1].Text = "-" + gameStats.gameResults[i].stakes[sn];
                             break;
                         case PlayerResult.STAY:
-                            item.SubItems[pos].Text = "stay";
-                            k++;
+                            item.SubItems[shuffleNo+1].Text = string.Format("stay ({0})", gameStats.gameResults[i].stakes[sn]);
                             break;
                     }
-
-                    pos++;
+                    sn++;
                 }
-
-                listViewPlayers.Items.Add( item );
             }
-        }
+        } 
+        
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Player> GetActivePlayers()
         {
             var list = gameStats.gameResults.Where(p => p.player.Money > 100).ToList();
             List<Player> players = new List<Player>();
 
-            for (int i = 0; i < list.Count; i++ )
+            for (int i = 0; i < list.Count; i++)
                 players.Add(list[i].player);
 
             return players;

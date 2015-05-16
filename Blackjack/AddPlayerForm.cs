@@ -10,26 +10,72 @@ using System.Windows.Forms;
 
 namespace Blackjack
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum PlayerMode
+    {
+        PM_ADD,
+        PM_EDIT
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class AddPlayerForm : Form
     {
+        private PlayerMode windowMode;
         private Player player = null;
-
-
-        public AddPlayerForm()
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="p"></param>
+        public AddPlayerForm( PlayerMode pm = PlayerMode.PM_ADD, Player p  = null)
         {
             InitializeComponent();
+
+            windowMode = pm;
+
+            if (pm == PlayerMode.PM_EDIT)
+            {
+                windowMode = PlayerMode.PM_EDIT;
+                this.buttonAddPlayer.Text = "OK";
+                player = p;
+
+                this.textBoxPlayerName.Text = p.Name;
+                this.textBoxPlayerMoney.Text = p.Money.ToString();
+            }
         }
 
-        public Player GetAddedPlayer()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Player GetPlayer()
         {
             return player;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void buttonAddPlayerClick(object sender, EventArgs e)
         {
             try
             {
-                player = new Player(this.textBoxPlayerName.Text, int.Parse(this.textBoxPlayerMoney.Text));
+                if (windowMode == PlayerMode.PM_ADD)
+                    player = new Player(this.textBoxPlayerName.Text, int.Parse(this.textBoxPlayerMoney.Text));
+                else
+                {
+                    player.Name = this.textBoxPlayerName.Text;
+                    player.Money = int.Parse(this.textBoxPlayerMoney.Text);
+                }
                 DialogResult = DialogResult.OK;
             }
             catch (FormatException)

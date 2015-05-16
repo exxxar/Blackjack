@@ -16,16 +16,25 @@ namespace Blackjack
         public List<PlayerResult> results = new List<PlayerResult>();
         public List<int> stakes = new List<int>();
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public BlackjackResult()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="shuffleNo"></param>
         public BlackjackResult( Player p, int shuffleNo )
         {
             player = p;
             shuffles.Add( shuffleNo );
             results.Add( p.PlayResult );
-            stakes.Add( p.Stake );
+            stakes.Add(p.Stake);
         }
     }
 
@@ -35,38 +44,36 @@ namespace Blackjack
     /// </summary>
     public class PlayerStats
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public List<BlackjackResult> gameResults = new List<BlackjackResult>();
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int curShuffle = 0;
 
 
-        public void AddPlayer(Player p)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="shuffleNo"></param>
+        public void AddShuffleResult( Player p, int shuffleNo )
         {
-            // check if a player with this name already exists
-            //...
+            int nPlayer = gameResults.FindIndex( g => g.player.Name == p.Name );
 
-            gameResults.Add( new BlackjackResult( p, curShuffle ) );
+            if (nPlayer >= 0)
+            {
+                gameResults[nPlayer].shuffles.Add( shuffleNo );
+                gameResults[nPlayer].results.Add( p.PlayResult );
+                gameResults[nPlayer].stakes.Add( p.Stake );
+            }
+            else
+            {
+                gameResults.Add( new BlackjackResult(p, curShuffle) );
+            }
         }
-
-        public void AddShuffleResult( Player p )
-        {
-            BlackjackResult res = new BlackjackResult();
-            res.player = p;
-            res.shuffles[curShuffle] = curShuffle;
-            res.results[curShuffle] = p.PlayResult;
-            res.stakes[curShuffle] = p.Stake;
-
-            gameResults.Add( res );
-
-            curShuffle++;
-        }
-
-        //public void SetPlayerResult(Player p)
-        //{
-        //    int idx = gameResults.Count - 1;
-        //    gameResults[idx].playerNames.Add(p.Name);
-        //    gameResults[idx].stakes.Add(p.Stake);
-        //    gameResults[idx].results.Add(p.PlayResult);
-        //}
     }
 }

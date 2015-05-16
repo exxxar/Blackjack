@@ -17,6 +17,7 @@ namespace Blackjack
     {
         BlackjackGame game = null;
         CardTableVisualizer cardtable = null;
+
         
         
         /// <summary>
@@ -36,6 +37,7 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
+        //public void StartNewShuffle()
         public async void StartNewShuffle()
         {
             game.Shuffle();
@@ -46,21 +48,15 @@ namespace Blackjack
                 MoveCardToPlayer(i);
                 await Task.Delay(900);
                 MoveCardToPlayer(i);
-
-                cardtable.Invalidate();
             }
 
             await Task.Delay(500);
             MoveCardToDealer();
 
-            cardtable.Invalidate();
-
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 DealerFirstHit(i);
             }
-            
-            cardtable.Invalidate();
         }
 
 

@@ -65,11 +65,32 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <param name="p"></param>
-	    public void addPlayer( Player p )
+	    public void addPlayer( Player player )
         {
-            p.SetScoreCounter( scoreCounter );
-            players.Add( p );
-            playerStates.Add( PlayerState.HIT );
+            if (players.Find(p => p.Name == player.Name) == null)
+            {
+                player.SetScoreCounter(scoreCounter);
+                players.Add(player);
+                playerStates.Add(PlayerState.HIT);
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="list"></param>
+        public void SetPlayerList( IEnumerable<Player> list )
+        {
+            players.Clear();
+
+            foreach (var p in list)
+            {
+                p.SetScoreCounter(scoreCounter);
+                players.Add(p);
+                playerStates.Add(PlayerState.HIT);
+
+            }
         }
 
 

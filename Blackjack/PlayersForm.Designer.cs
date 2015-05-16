@@ -32,6 +32,7 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.listViewPlayers = new System.Windows.Forms.ListView();
             this.buttonAdd = new System.Windows.Forms.Button();
+            this.buttonEdit = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonRemove
@@ -42,9 +43,9 @@
             this.buttonRemove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRemove.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonRemove.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonRemove.Location = new System.Drawing.Point(225, 268);
+            this.buttonRemove.Location = new System.Drawing.Point(184, 268);
             this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(207, 68);
+            this.buttonRemove.Size = new System.Drawing.Size(166, 68);
             this.buttonRemove.TabIndex = 7;
             this.buttonRemove.Text = "REMOVE";
             this.buttonRemove.UseVisualStyleBackColor = false;
@@ -58,9 +59,9 @@
             this.buttonOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonOK.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonOK.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonOK.Location = new System.Drawing.Point(560, 268);
+            this.buttonOK.Location = new System.Drawing.Point(632, 268);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(207, 68);
+            this.buttonOK.Size = new System.Drawing.Size(135, 68);
             this.buttonOK.TabIndex = 6;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = false;
@@ -90,11 +91,27 @@
             this.buttonAdd.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.buttonAdd.Location = new System.Drawing.Point(12, 268);
             this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(207, 68);
+            this.buttonAdd.Size = new System.Drawing.Size(166, 68);
             this.buttonAdd.TabIndex = 9;
             this.buttonAdd.Text = "ADD";
             this.buttonAdd.UseVisualStyleBackColor = false;
             this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
+            // 
+            // buttonEdit
+            // 
+            this.buttonEdit.BackColor = System.Drawing.Color.ForestGreen;
+            this.buttonEdit.FlatAppearance.BorderColor = System.Drawing.Color.Yellow;
+            this.buttonEdit.FlatAppearance.BorderSize = 2;
+            this.buttonEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonEdit.Font = new System.Drawing.Font("Baskerville Old Face", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonEdit.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonEdit.Location = new System.Drawing.Point(356, 268);
+            this.buttonEdit.Name = "buttonEdit";
+            this.buttonEdit.Size = new System.Drawing.Size(166, 68);
+            this.buttonEdit.TabIndex = 10;
+            this.buttonEdit.Text = "EDIT";
+            this.buttonEdit.UseVisualStyleBackColor = false;
+            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
             // 
             // PlayersForm
             // 
@@ -102,6 +119,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LimeGreen;
             this.ClientSize = new System.Drawing.Size(779, 350);
+            this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.listViewPlayers);
             this.Controls.Add(this.buttonRemove);
@@ -120,5 +138,6 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.ListView listViewPlayers;
         private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.Button buttonEdit;
     }
 }

@@ -49,14 +49,16 @@ namespace Blackjack
         /// </summary>
 	    public void UnpackNew()
         {
+            Random r = new Random();
+
             cards.Clear();
             for (byte i = 0; i < DECK_SIZE; i++)
             {
                 Card card = new Card();
-                card.setNumber( i );
+                //card.setNumber( i );
 
                 // for testing blackjacks:
-                //card.setNumber((byte)(r.Next() % 3 + 49) );
+                card.setNumber((byte)(r.Next() % 3 + 49) );
 
                 cards.Add( card );
             }
