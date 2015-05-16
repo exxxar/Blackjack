@@ -97,6 +97,21 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="minstake"></param>
+        public void RemovePlayersMinStake(int minstake)
+        {
+            for ( int i=0; i<players.Count; i++ )
+                if ( players[i].Money < minstake )
+                {
+                    players.RemoveAt(i);
+                    i--;
+                }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
         public Player GetPlayer(int pos)

@@ -13,21 +13,34 @@ namespace Blackjack
     /// <summary>
     /// 
     /// </summary>
+    public delegate void GameOverHandler();
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class CardTableController
     {
         BlackjackGame game = null;
         CardTableVisualizer cardtable = null;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public event GameOverHandler OnGameOver;
         
         
         /// <summary>
         /// 
         /// </summary>
         /// <param name="blackjackgame"></param>
-        public CardTableController( BlackjackGame blackjackgame, CardTableVisualizer gamevisualizer )
+        /// <param name="gamevisualizer"></param>
+        /// <param name="handler"></param>
+        public CardTableController( BlackjackGame blackjackgame, CardTableVisualizer gamevisualizer, GameOverHandler handler )
         {
             game = blackjackgame;
             cardtable = gamevisualizer;
+            OnGameOver += handler;
         }
 
 
@@ -37,20 +50,19 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
-        //public void StartNewShuffle()
         public async void StartNewShuffle()
         {
             game.Shuffle();
 
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                await Task.Delay(900);
+                await Task.Delay(700);
                 MoveCardToPlayer(i);
-                await Task.Delay(900);
+                await Task.Delay(700);
                 MoveCardToPlayer(i);
             }
 
-            await Task.Delay(500);
+            await Task.Delay(700);
             MoveCardToDealer();
 
             for (int i = 0; i < game.GetPlayersCount(); i++)
@@ -128,13 +140,13 @@ namespace Blackjack
             cardtable.Invalidate();
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
-        public void DealerHit()
-        {
-            // if all busted or won no dealer's move!
+        /// <returns></returns>
+        private bool CheckAllBustOrWon()
+        {    
             int k = 0;
             for (; k < game.GetPlayersCount(); k++)
             {
@@ -143,13 +155,25 @@ namespace Blackjack
                     break;
                 }
             }
+            return ( k == game.GetPlayersCount() );
+        }
 
-            if (k == game.GetPlayersCount())
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public void DealerHit()
+        {
+            // if all busted or won no dealer's move!
+            if ( CheckAllBustOrWon() )
             {
                 for (int i = 0; i < game.GetPlayersCount(); i++)
                 {
                     game.PlayResults(i);
                 }
+
+                OnGameOver();
+
                 cardtable.Invalidate();
                 return;
             }
@@ -166,6 +190,8 @@ namespace Blackjack
                 game.PlayResults(i);
                 cardtable.Invalidate();
             }
+
+            OnGameOver();
         }
 
 
@@ -208,6 +234,8 @@ namespace Blackjack
                             //if (game.CheckGameFinished())
                             if (!game.CheckStates())
                                 DealerHit();
+                            else
+                                OnGameOver();
 
                             cardtable.Invalidate();
                         }

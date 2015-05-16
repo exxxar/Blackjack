@@ -38,6 +38,20 @@ namespace Blackjack
             InitializeComponent();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Msg()
+        {
+            MessageBox.Show( "Game Over!" );
+
+            // ... after the game is over
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+                statistics.AddShuffleResult( game.GetPlayer(i), curShuffle );
+
+            curShuffle++;
+        }
+
 
         /// <summary>
         /// 
@@ -46,7 +60,6 @@ namespace Blackjack
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            //StartGameForm form = new StartGameForm();
             PlayersForm form = new PlayersForm();
             if (form.ShowDialog() == DialogResult.OK)
             {
@@ -57,10 +70,8 @@ namespace Blackjack
                 gamevisualizer = new CardTableVisualizer(game);
                 gamevisualizer.PrepareGraphics(this.Width, this.Height, CreateGraphics());
 
-                gamecontroller = new CardTableController(game, gamevisualizer);
+                gamecontroller = new CardTableController(game, gamevisualizer, Msg);
 
-                //foreach (var p in form.GetActivePlayers() )
-                //    game.addPlayer( p );
                 game.SetPlayerList( form.GetActivePlayers() );
 
                 NewGame();
@@ -83,10 +94,12 @@ namespace Blackjack
             form.ShowDialog();
             statistics = form.gameStats;
 
-            game.SetPlayerList( form.GetActivePlayers() );
+            if (form.bChangedPlayer)
+            {
+                game.SetPlayerList( form.GetActivePlayers() );
 
-            if ( form.bChangedPlayer )
                 NewGame();
+            }
         }
 
 
@@ -95,6 +108,10 @@ namespace Blackjack
         /// </summary>
         private void NewGame()
         {
+            // get rid off of all those who cannot pay
+            game.RemovePlayersMinStake(100);
+
+            //
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 MakeBetForm makeBetForm = new MakeBetForm(game.GetPlayer(i));
@@ -103,18 +120,9 @@ namespace Blackjack
 
             // Redraw the form
             this.Invalidate();
-
-
-            //GameIsOver += gamecontroller.GameOver;
-
-
+            
             // ...And start new game
             gamecontroller.StartNewShuffle();
-
-            // ... after the game is over
-            for (int i = 0; i < game.GetPlayersCount(); i++)
-                statistics.AddShuffleResult(game.GetPlayer(i), curShuffle);
-            curShuffle++;
         }
        
 
@@ -130,7 +138,7 @@ namespace Blackjack
             {
                 ChangePlayers();
             }
-            if (gamevisualizer.bNewGameHighlight)
+            else if (gamevisualizer.bNewGameHighlight)
             {
                 if (!game.CheckStates())
                 {
@@ -139,20 +147,22 @@ namespace Blackjack
                 }
                 NewGame();
             }
-
-            try
+            else
             {
-                gamecontroller.UserActions( e.Location );
-            }
-            catch (InvalidOperationException)
-            {
-                MessageBox.Show( "You've not enough money to double down!" );
+                try
+                {
+                    gamecontroller.UserActions(e.Location);
+                }
+                catch (InvalidOperationException)
+                {
+                    MessageBox.Show("You've not enough money to double down!");
+                }
             }
         }
 
 
         /// <summary>
-        /// New game (new shuffle) can be started by user after pressing F@
+        /// New game (new shuffle) can be started by user after pressing F2
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -169,12 +179,6 @@ namespace Blackjack
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
         {
             Graphics DC = CreateGraphics();
@@ -185,24 +189,12 @@ namespace Blackjack
             gamevisualizer.bNewGameHighlight = (newGameRect.Contains(e.Location)) ? true : false;
             gamevisualizer.Invalidate();
         }
-        
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_Resize(object sender, EventArgs e)
         {
             Graphics DC = CreateGraphics();
