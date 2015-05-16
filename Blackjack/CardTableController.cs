@@ -198,6 +198,22 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public bool DealerShouldWait()
+        {
+            for (int i = 0; i < game.GetPlayersCount(); i++)
+            {
+                if ( game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED && game.GetPlayerState(i) != PlayerState.STAND)
+                    return true;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="nPlayer"></param>
         /// <returns></returns>
         public void DealerFirstHit(int nPlayer)
@@ -225,40 +241,34 @@ namespace Blackjack
                         // если берем, то в этом случае сразу выходим отсюда
                         if (res == System.Windows.Forms.DialogResult.Yes)
                         {
-                            game.SetPlayerState(nPlayer, PlayerState.BLACKJACK);
-
-                            game.GetPlayer(nPlayer).WinStake();
+                            game.GetPlayer(nPlayer).PlayResult = PlayerResult.WIN;
                             game.totalLose += game.GetPlayer(nPlayer).Stake;
-
-                            // check if it was the last player and others are waiting
-                            //if (game.CheckGameFinished())
-                            if (!game.CheckStates())
-                                DealerHit();
-                            else
-                                OnGameOver();
-
-                            cardtable.Invalidate();
                         }
-                        else
+                        
+                        // check if it was the last player and others are waiting
+                        
+                        if ( !DealerShouldWait() )
+                                DealerHit();
+
+                        if (game.CheckGameFinished())
                         {
-                            game.SetPlayerState(nPlayer, PlayerState.STANDBLACKJACK);
-
-                            // TODO: check for all stopped playing!!!
-                            if (game.CheckStates())
-                            //if (game.CheckGameFinished())
-                                DealerHit();
-
-                            cardtable.Invalidate();
+                            OnGameOver();
                         }
+
+                        cardtable.Invalidate();
                     }
                     else
                     {
                         // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
                         if (game.GetPlayersCount() == 1)
                         {
-                            game.GetPlayer(nPlayer).BonusStake();
-                            game.GetPlayer(nPlayer).WinStake();
-                            game.totalLose += game.GetPlayer(nPlayer).Stake;
+                            game.PlayResults( nPlayer );
+                            
+                            //game.GetPlayer(nPlayer).BonusStake();
+                            //game.GetPlayer(nPlayer).WinStake();
+                            //game.totalLose += game.GetPlayer(nPlayer).Stake;
+
+                            OnGameOver();
                         }
                     }
                 }
@@ -281,7 +291,9 @@ namespace Blackjack
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 hitrects[i] = new Rectangle(25 + 105 * i, 285, 30, 30);
-                if (hitrects[i].Contains(mousePoint) && game.GetPlayerState(i) != PlayerState.STAND)
+                if (hitrects[i].Contains(mousePoint) && 
+                    game.GetPlayerState(i) != PlayerState.STAND && 
+                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED)
                 {
                     MoveCardToPlayer(i);
                 }
@@ -291,7 +303,9 @@ namespace Blackjack
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 standrects[i] = new Rectangle(60 + 105 * i, 285, 30, 30);
-                if (standrects[i].Contains(mousePoint) && game.GetPlayerState(i) != PlayerState.BUST)
+                if (standrects[i].Contains(mousePoint) && 
+                    game.GetPlayerState(i) != PlayerState.BUST && 
+                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED )
                 {
                     game.SetPlayerState(i, PlayerState.STAND);
                     cardtable.Invalidate();
@@ -302,7 +316,9 @@ namespace Blackjack
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 doublerects[i] = new Rectangle(95 + 105 * i, 285, 30, 30);
-                if (doublerects[i].Contains(mousePoint) && game.GetPlayerState(i) != PlayerState.STAND)
+                if (doublerects[i].Contains(mousePoint) && 
+                    game.GetPlayerState(i) != PlayerState.STAND && 
+                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED )
                 {
                    game.SetPlayerState(i, PlayerState.DOUBLE);
                    MoveCardToPlayer(i);

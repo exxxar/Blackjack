@@ -41,10 +41,8 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
-        public void Msg()
+        public void FixGameResults()
         {
-            MessageBox.Show( "Game Over!" );
-
             // ... after the game is over
             for (int i = 0; i < game.GetPlayersCount(); i++)
                 statistics.AddShuffleResult( game.GetPlayer(i), curShuffle );
@@ -70,7 +68,7 @@ namespace Blackjack
                 gamevisualizer = new CardTableVisualizer(game);
                 gamevisualizer.PrepareGraphics(this.Width, this.Height, CreateGraphics());
 
-                gamecontroller = new CardTableController(game, gamevisualizer, Msg);
+                gamecontroller = new CardTableController(game, gamevisualizer, FixGameResults);
 
                 game.SetPlayerList( form.GetActivePlayers() );
 
@@ -147,7 +145,7 @@ namespace Blackjack
                 }
                 NewGame();
             }
-            else
+            else if ( !game.CheckGameFinished() )
             {
                 try
                 {

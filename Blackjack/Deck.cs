@@ -8,8 +8,14 @@ namespace Blackjack
 {
     public class Deck
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public const byte DECK_SIZE = 52;
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected List<Card> cards = new List<Card>();
 
 
@@ -55,10 +61,10 @@ namespace Blackjack
             for (byte i = 0; i < DECK_SIZE; i++)
             {
                 Card card = new Card();
-                //card.setNumber( i );
+                card.setNumber( i );
 
                 // for testing blackjacks:
-                card.setNumber((byte)(r.Next() % 3 + 49) );
+                //card.setNumber((byte)(r.Next() % 3 + 49) );
 
                 cards.Add( card );
             }

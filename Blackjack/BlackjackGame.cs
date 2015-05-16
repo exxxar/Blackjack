@@ -27,9 +27,16 @@ namespace Blackjack
         protected CardHolder dealer = new CardHolder("Dealer");		// composite for the dealer
         protected List<Player> players = new List<Player>();		// aggregates the player
         
+
+        /// <summary>
+        /// Player states (BUST, BLACKJACK, etc.) are not included to the Player Info
+        /// since these states are not universal for all kinds of games
+        /// </summary>
         private List<PlayerState> playerStates = new List<PlayerState>();
 
+
         IScoreCounter scoreCounter = new BlackjackScoreCounter();
+
 
         /// <summary>
         /// 
@@ -60,21 +67,6 @@ namespace Blackjack
             totalLose = 0;
         }
 	
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="p"></param>
-	    public void addPlayer( Player player )
-        {
-            if (players.Find(p => p.Name == player.Name) == null)
-            {
-                player.SetScoreCounter(scoreCounter);
-                players.Add(player);
-                playerStates.Add(PlayerState.HIT);
-            }
-        }
-
 
         /// <summary>
         /// 
@@ -191,37 +183,23 @@ namespace Blackjack
             {
                 if (GetPlayerState(i) != PlayerState.BUST &&
                     GetPlayerState(i) != PlayerState.STAND &&
-                    GetPlayerState(i) != PlayerState.BLACKJACK && 
-                    GetPlayerState(i) != PlayerState.STANDBLACKJACK)
+                    GetPlayerState(i) != PlayerState.BLACKJACK)
                     return false;
             }
             return true;
         }
 
 
-        /// <summary>
+                /// <summary>
         /// 
         /// </summary>
         public bool CheckGameFinished()
         {
-            int cnt = 0;
             for (int i = 0; i < players.Count; i++)
             {
-                //string s = string.Format("{0}\n{1}", players[i].PlayResult, GetPlayerState(i));
-                //System.Windows.Forms.MessageBox.Show(s);
-
-                if (players[i].PlayResult == PlayerResult.UNDEFINED )
+                if (players[i].PlayResult == PlayerResult.UNDEFINED)
                     return false;
-
-                if (GetPlayerState(i) != PlayerState.BUST && 
-                    GetPlayerState(i) != PlayerState.STAND && 
-                    GetPlayerState(i) != PlayerState.BLACKJACK )
-                    cnt++;
             }
-
-            if (cnt < GetPlayersCount())
-                return false;
-
             return true;
         }
 
@@ -260,22 +238,15 @@ namespace Blackjack
             // DEALER WINS
 	        if ( players[ nPlayer ].CountScore() < dealer.CountScore() )
 	        {
-                //if ( GetPlayerState(nPlayer) != PlayerState.BUST )
-                {
-                    players[ nPlayer ].LoseStake();
-                    totalLose -= players[nPlayer].Stake;
-                }
+                players[ nPlayer ].LoseStake();
+                totalLose -= players[nPlayer].Stake;
                 return -1;
 	        }
             // PLAYER WINS
 	        else if ( players[ nPlayer ].CountScore() > dealer.CountScore() )
 	        {
-                if (dealer.PlayerHand.GetCardsNumber() > 1)
-                {
-                    players[nPlayer].WinStake();
-                    totalLose += players[ nPlayer ].Stake;
-                    return 0;
-                }
+                players[nPlayer].WinStake();
+                totalLose += players[ nPlayer ].Stake;
                 return 1;
 	        }
             // STAY
@@ -299,28 +270,32 @@ namespace Blackjack
             // отдельно рассматриваем случаи с блекджеком (там другие правила начисления выигрыша)
             if ( CheckBlackJack( players[ nPlayer ] ) )				
 	        {
-                // если при блекджеке игрока нет блекджека дилера,
-                if ( !CheckBlackJack( dealer ) )					    
-		        {
-                    // то еще проверяем, по сколько у них карт:			
-                    // если у дилера больше 1 карты, т.е. он пытался добрать карты, чтобы "перебить" блекджек игрока    
-			        if ( dealer.PlayerHand.GetCardsNumber() > 1 )
-                        // то выигрыш игрока должен быть 3 к 2 (по умолчанию)
-                        players[nPlayer].BonusStake();
+                // if he/she didn't take 1-to-1 right away
+                if (players[nPlayer].PlayResult != PlayerResult.WIN)
+                {
+                    // если при блекджеке игрока нет блекджека дилера,
+                    if (!CheckBlackJack(dealer))
+                    {
+                        // то еще проверяем, по сколько у них карт:			
+                        // если у дилера больше 1 карты, т.е. он пытался добрать карты, чтобы "перебить" блекджек игрока    
+                        if (dealer.PlayerHand.GetCardsNumber() > 1)
+                            // то выигрыш игрока должен быть 3 к 2 (по умолчанию)
+                            players[nPlayer].BonusStake();
 
-                    // также есть особая ситуация в самом начале (с раздачи):
-                    // у дилера 1 карта, у игрока - 2
-			        else if ( dealer.PlayerHand.GetCardsNumber() == 1				    
-                                && players[nPlayer].PlayerHand.GetCardsNumber() == 2)
-                        // в таком случае тоже выигрыш игрока равен 3 к 2
-                        players[ nPlayer ].BonusStake();
+                        // также есть особая ситуация в самом начале (с раздачи):
+                        // у дилера 1 карта, у игрока - 2
+                        else if (dealer.PlayerHand.GetCardsNumber() == 1
+                                    && players[nPlayer].PlayerHand.GetCardsNumber() == 2)
+                            // в таком случае тоже выигрыш игрока равен 3 к 2
+                            players[nPlayer].BonusStake();
 
-                    // еще если три семерки, доп. выигрыш игроку (2 к 1)
-                    if (Check777(players[ nPlayer ]) == true)				
-			        {
-                        players[ nPlayer ].BonusStake(2);
-			        }
-		        }
+                        // еще если три семерки, доп. выигрыш игроку (2 к 1)
+                        if (Check777(players[nPlayer]) == true)
+                        {
+                            players[nPlayer].BonusStake();
+                        }
+                    }
+                }
 	        }
             // если блекджек был у дилера, то просто выводим эту информацию
 	        if ( CheckBlackJack( dealer ) )				
