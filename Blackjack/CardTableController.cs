@@ -28,6 +28,12 @@ namespace Blackjack
         /// 
         /// </summary>
         public event GameOverHandler OnGameOver;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private byte nDealerWaits = 0;
+
         
         
         /// <summary>
@@ -64,6 +70,9 @@ namespace Blackjack
 
             await Task.Delay(700);
             MoveCardToDealer();
+
+
+            nDealerWaits = 0;
 
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
@@ -199,15 +208,21 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool DealerShouldWait()
+        public bool DealerShouldWait( byte nDealerWaits )
         {
+            byte nTotalWaits = 0;
+
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                if ( game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED && game.GetPlayerState(i) != PlayerState.STAND)
-                    return true;
+                if (game.GetPlayerState(i) == PlayerState.STAND ||
+                    game.GetPlayer(i).PlayResult != PlayerResult.UNDEFINED)
+                        nTotalWaits++;
             }
 
-            return false;
+            if (nTotalWaits + nDealerWaits == game.GetPlayersCount())
+                return false;
+            else
+                return true;
         }
 
 
@@ -244,10 +259,13 @@ namespace Blackjack
                             game.GetPlayer(nPlayer).PlayResult = PlayerResult.WIN;
                             game.totalLose += game.GetPlayer(nPlayer).Stake;
                         }
+
+                        if (res == System.Windows.Forms.DialogResult.No)
+                            nDealerWaits++;
                         
                         // check if it was the last player and others are waiting
                         
-                        if ( !DealerShouldWait() )
+                        if ( !DealerShouldWait( nDealerWaits ) )
                                 DealerHit();
 
                         if (game.CheckGameFinished())
@@ -261,7 +279,7 @@ namespace Blackjack
                     {
                         // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
                         if (game.GetPlayersCount() == 1)
-                        {
+                        {                       
                             game.PlayResults( nPlayer );
                             
                             //game.GetPlayer(nPlayer).BonusStake();

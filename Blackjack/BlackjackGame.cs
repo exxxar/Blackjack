@@ -228,8 +228,12 @@ namespace Blackjack
             // then check for dealer's bust
             if (dealer.CountScore() > 21)
             {
+                // additional check!
+                if (GetPlayer(nPlayer).PlayResult != PlayerResult.WIN)
+                {
+                    totalLose += players[nPlayer].Stake;
+                }
                 players[nPlayer].WinStake();
-                totalLose += players[nPlayer].Stake;
                 return 1;
             }
 
@@ -245,8 +249,12 @@ namespace Blackjack
             // PLAYER WINS
 	        else if ( players[ nPlayer ].CountScore() > dealer.CountScore() )
 	        {
+                // additional check if the player has already taken the win
+                if ( GetPlayer(nPlayer).PlayResult != PlayerResult.WIN )
+                {
+                    totalLose += players[nPlayer].Stake;
+                }
                 players[nPlayer].WinStake();
-                totalLose += players[ nPlayer ].Stake;
                 return 1;
 	        }
             // STAY

@@ -17,13 +17,26 @@ namespace Blackjack
     /// </summary>
     public partial class MainForm : Form
     {
-        BlackjackGame game = null;
-        CardTableController gamecontroller = null;
-        CardTableVisualizer gamevisualizer = null;
+        /// <summary>
+        /// 
+        /// </summary>
+        private BlackjackGame game = null;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private CardTableController gamecontroller = null;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private CardTableVisualizer gamevisualizer = null;
 
-
-        PlayerStats statistics = new PlayerStats();
-
+        /// <summary>
+        /// 
+        /// </summary>
+        private PlayerStats statistics = new PlayerStats();
+        
         /// <summary>
         /// 
         /// </summary>
@@ -160,10 +173,10 @@ namespace Blackjack
 
 
         /// <summary>
-        /// New game (new shuffle) can be started by user after pressing F2
+        /// New game (new shuffle) can be initiated by user pressing F2
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender of KeyDown event</param>
+        /// <param name="e">The arguments of KeyDown event</param>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F2)
@@ -177,6 +190,12 @@ namespace Blackjack
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
         {
             Graphics DC = CreateGraphics();
@@ -188,11 +207,23 @@ namespace Blackjack
             gamevisualizer.Invalidate();
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_Resize(object sender, EventArgs e)
         {
             Graphics DC = CreateGraphics();
