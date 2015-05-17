@@ -11,9 +11,24 @@ namespace Blackjack
     /// </summary>
     public class BlackjackResult
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public Player player;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public List<int> shuffles = new List<int>();
+
+        /// <summary>
+        /// 
+        /// </summary>
         public List<PlayerResult> results = new List<PlayerResult>();
+
+        /// <summary>
+        /// 
+        /// </summary>
         public List<int> stakes = new List<int>();
 
 

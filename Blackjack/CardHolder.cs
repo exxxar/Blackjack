@@ -14,7 +14,7 @@ namespace Blackjack
         private IScoreCounter scoreCounter;
 
         protected string name;
-        protected Hand hand = new Hand();
+        protected CardSet hand = new CardSet();
        
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
-        public Hand PlayerHand
+        public CardSet PlayerHand
         {
             get { return hand; }
             set { hand = value; }

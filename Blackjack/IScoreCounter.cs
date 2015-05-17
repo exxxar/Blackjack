@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IScoreCounter
     {
-        byte CountScore(Hand hand);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <returns></returns>
+        byte CountScore(CardSet hand);
     }
 }

@@ -13,6 +13,11 @@ namespace Blackjack
     public class BlackjackGame: ICardGame
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public const int MIN_STAKE = 100;
+
+        /// <summary>
         /// The number of decks is 4 
         /// </summary>
         public const int DECKS_COUNT = 4;
@@ -30,7 +35,7 @@ namespace Blackjack
 
         /// <summary>
         /// Player states (BUST, BLACKJACK, etc.) are not included to the Player Info
-        /// since these states are not universal for all kinds of games
+        /// since these states are not universal for all kinds of games while Players should be possible to use in any card game 
         /// </summary>
         private List<PlayerState> playerStates = new List<PlayerState>();
 
@@ -90,10 +95,10 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <param name="minstake"></param>
-        public void RemovePlayersMinStake(int minstake)
+        public void RemovePlayersMinStake()
         {
             for ( int i=0; i<players.Count; i++ )
-                if ( players[i].Money < minstake )
+                if ( players[i].Money < MIN_STAKE )
                 {
                     players.RemoveAt(i);
                     i--;
@@ -305,11 +310,6 @@ namespace Blackjack
                     }
                 }
 	        }
-            // если блекджек был у дилера, то просто выводим эту информацию
-	        if ( CheckBlackJack( dealer ) )				
-	        {
-                dealerBlackjack = true;
-	        }
         }
 
 
@@ -333,7 +333,7 @@ namespace Blackjack
         {
             if (cardHolder.CountScore() == 21)
             {
-                Hand hand = cardHolder.PlayerHand;
+                CardSet hand = cardHolder.PlayerHand;
 
                 if (hand.GetCardsNumber() == 3)
                     if (hand[0].Rank == 7 && hand[1].Rank == 7 && hand[2].Rank == 7)
@@ -362,11 +362,11 @@ namespace Blackjack
         /// </summary>
         public void Shuffle()
         {
-            //
+            // initialize dealer states
             dealerBlackjack = false;
             dealerBust = false;
             
-            // обнулим хэнды
+            // ------------------------------------------ clear hands
             dealer.ClearHand();				
 
             for (int i=0; i<players.Count; i++ )
@@ -375,11 +375,13 @@ namespace Blackjack
                 SetPlayerState( i, PlayerState.HIT );
                 players[i].PlayResult = PlayerResult.UNDEFINED;
             }
+            // ------------------------------------------------------
 
-            // перемешаем случайно все колоды в шузах
+            // randomly shuffle all decks
             foreach (Deck d in decks)
 		        d.Shuffle();
 
+            // initialize totalLose
             totalLose = 0;
         }
     }

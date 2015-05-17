@@ -115,14 +115,23 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method starts new game (new shuffle).
+        /// Method checks if particular player has enough money to proceed and proposes to make bets
         /// </summary>
         private void NewGame()
         {
-            // get rid off of all those who cannot pay
-            game.RemovePlayersMinStake(100);
+            // exclude all those players who have not enough money to cannot pay
+            game.RemovePlayersMinStake();
 
-            //
+            // check if there's at least one player who can do minimal bet
+            if (game.GetPlayersCount() == 0)
+            {
+                MessageBox.Show( "There are no more players or all players have not enough money to play!" );
+                gamevisualizer.Invalidate();
+                return;
+            }
+
+            // propose to do the bet for each player
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 MakeBetForm makeBetForm = new MakeBetForm(game.GetPlayer(i));
@@ -130,7 +139,7 @@ namespace Blackjack
             }
 
             // Redraw the form
-            this.Invalidate();
+            gamevisualizer.Invalidate();
             
             // ...And start new game
             gamecontroller.StartNewShuffle();

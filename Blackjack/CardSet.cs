@@ -9,7 +9,7 @@ namespace Blackjack
     /// <summary>
     /// 
     /// </summary>
-    public class Hand
+    public class CardSet
     {
         protected List<Card> cards = new List<Card>();
 
@@ -17,9 +17,21 @@ namespace Blackjack
         /// 
         /// </summary>
         /// <param name="card"></param>
-        public void AddCard( Card card )
+        public void AddCard(Card card)
         {
-            cards.Add( card );
+            cards.Add(card);
+        }
+        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Card PopCard()
+        {
+            Card card = cards.Last();
+            cards.Remove(card);
+            return card;
         }
 
 
@@ -28,18 +40,17 @@ namespace Blackjack
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-	    public Card this [int idx]
+        public Card this[int idx]
         {
             get { return cards[idx]; }
             set { cards[idx] = value; }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-	    public int GetCardsNumber()
+        public int GetCardsNumber()
         {
             return cards.Count;
         }
@@ -48,7 +59,7 @@ namespace Blackjack
         /// <summary>
         /// 
         /// </summary>
-	    public void Clear()
+        public void Clear()
         {
             cards.Clear();
         }

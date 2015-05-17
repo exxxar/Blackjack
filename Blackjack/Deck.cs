@@ -6,19 +6,17 @@ using System.Threading.Tasks;
 
 namespace Blackjack
 {
-    public class Deck
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Deck : CardSet
     {
         /// <summary>
         /// 
         /// </summary>
         public const byte DECK_SIZE = 52;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected List<Card> cards = new List<Card>();
-
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -27,29 +25,7 @@ namespace Blackjack
             UnpackNew();
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-	    public Card PopCard()
-        {
-            Card card = cards.Last();
-            cards.Remove( card );
-            return card;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public int GetCardsNumber()
-        {
-            return cards.Count;
-        }
-
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -63,10 +39,10 @@ namespace Blackjack
                 Card card = new Card();
                 card.setNumber( i );
 
-                // for testing blackjacks:
+                // for testing blackjacks (only Q,K and A are generated)
                 //card.setNumber((byte)(r.Next() % 3 + 49) );
 
-                cards.Add( card );
+                AddCard( card );
             }
         }
 
@@ -77,7 +53,6 @@ namespace Blackjack
 	    public void Shuffle()
         {
             UnpackNew();
-
             Random rand = new Random( DateTime.Now.Second );
             cards = cards.OrderBy(item => rand.Next() % 52).ToList();
         }

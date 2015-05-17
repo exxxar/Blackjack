@@ -11,29 +11,38 @@ namespace Blackjack
     /// <summary>
     /// 
     /// </summary>
-    public class CardTableVisualizer
+    public class CardTableVisualizer : IDisposable
     {
+        private BlackjackGame game = null;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private Graphics DC;
         private Graphics g = null;
         private Bitmap dbufBitmap = null;
 
         Bitmap cardBack = null;
-        private Bitmap[] cardImages = new Bitmap[52];
+        private Bitmap[] cardImages = new Bitmap[ Deck.DECK_SIZE ];
 
+        /// <summary>
+        /// 
         Point dealerCoords;
-        public Point[] playerCoords = new Point[BlackjackGame.MAX_PLAYERS];
+        private Point[] playerCoords = new Point[BlackjackGame.MAX_PLAYERS];
+        private Point[] shoesCoords = new Point[BlackjackGame.DECKS_COUNT];
+        private Point[] shoesCoordsToDraw = new Point[BlackjackGame.DECKS_COUNT];
+        /// </summary>
 
-        public Point[] shoesCoords = new Point[BlackjackGame.DECKS_COUNT];
-        public Point[] shoesCoordsToDraw = new Point[BlackjackGame.DECKS_COUNT];
-
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bPlayersHighlight = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bNewGameHighlight = false;
-
-
-        BlackjackGame game = null;
-
-
-
+        
 
         /// <summary>
         /// 
@@ -333,5 +342,16 @@ namespace Blackjack
         }
 
         #endregion
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            dbufBitmap.Dispose();
+            for (int i = 0; i < Deck.DECK_SIZE; i++)
+                cardImages[i].Dispose();
+        }
     }
 }

@@ -16,8 +16,14 @@ namespace Blackjack
     /// </summary>
     public partial class PlayersForm : Form
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bChangedPlayer = false;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public PlayerStats gameStats { get; set; }
 
         /// <summary>
@@ -62,6 +68,14 @@ namespace Blackjack
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
+            if (GetActivePlayers().Count() == BlackjackGame.MAX_PLAYERS)
+            {
+                MessageBox.Show( string.Format(
+                                    "You can't add a new player to the game!\nAll {0} players are in the game!",
+                                    BlackjackGame.MAX_PLAYERS ) );
+                return;
+            }
+
             AddPlayerForm form = new AddPlayerForm();
             if (form.ShowDialog() == DialogResult.OK)
             {

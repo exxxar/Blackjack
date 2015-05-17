@@ -74,13 +74,13 @@
     <Compile Include="CardTableController.cs" />
     <Compile Include="CardTableVisualizer.cs" />
     <Compile Include="Deck.cs" />
+    <Compile Include="CardSet.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Hand.cs" />
     <Compile Include="ICardGame.cs" />
     <Compile Include="IScoreCounter.cs" />
     <Compile Include="MakeBetForm.cs">
@@ -127,6 +127,7 @@
     <EmbeddedResource Include="AddPlayerForm.resx">
       <DependentUpon>AddPlayerForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="BlackjackClassDiagram.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
