@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BlackjackException.cs" />
     <Compile Include="BlackjackGame.cs" />
+    <Compile Include="BlackjackResult.cs" />
     <Compile Include="BlackjackScoreCounter.cs" />
     <Compile Include="BustException.cs" />
     <Compile Include="Card.cs" />

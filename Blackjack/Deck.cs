@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Blackjack
 {
     /// <summary>
-    /// 
+    /// Deck class
     /// </summary>
     public class Deck : CardSet
     {
         /// <summary>
-        /// 
+        /// The number of cards in each deck is 52 by default (from 2♥ to A♠)
         /// </summary>
         public const byte DECK_SIZE = 52;
 
         
         /// <summary>
-        /// 
+        /// Default constructor
         /// </summary>
         public Deck()
         {
@@ -27,7 +25,7 @@ namespace Blackjack
 
         
         /// <summary>
-        /// 
+        /// Method fills a deck with cards sequentially from 2♥ to A♠
         /// </summary>
 	    public void UnpackNew()
         {
@@ -48,13 +46,13 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method shuffles new deck
         /// </summary>
 	    public void Shuffle()
         {
             UnpackNew();
-            Random rand = new Random( DateTime.Now.Second );
-            cards = cards.OrderBy(item => rand.Next() % 52).ToList();
+            Random rand = new Random( DateTime.Now.Millisecond );
+            cards = cards.OrderBy(item => rand.Next()).ToList();
         }
     }
 }

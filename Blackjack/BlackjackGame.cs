@@ -377,9 +377,9 @@ namespace Blackjack
             }
             // ------------------------------------------------------
 
-            // randomly shuffle all decks
-            foreach (Deck d in decks)
-		        d.Shuffle();
+            // randomly shuffle all decks (don't use foreach! otherwise all decks will be the same)
+            for (int i = 0; i < DECKS_COUNT; i++)
+                decks[i].Shuffle();
 
             // initialize totalLose
             totalLose = 0;

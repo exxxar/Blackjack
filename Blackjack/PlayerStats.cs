@@ -1,80 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Blackjack
 {
     /// <summary>
-    /// 
-    /// </summary>
-    public class BlackjackResult
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public Player player;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<int> shuffles = new List<int>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<PlayerResult> results = new List<PlayerResult>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<int> stakes = new List<int>();
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public BlackjackResult()
-        {
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="shuffleNo"></param>
-        public BlackjackResult( Player p, int shuffleNo )
-        {
-            player = p;
-            shuffles.Add( shuffleNo );
-            results.Add( p.PlayResult );
-            stakes.Add(p.Stake);
-        }
-    }
-
-
-    /// <summary>
-    /// 
+    /// Basically, a wrapper over collection of <see cref="BlackjackResult"/>
     /// </summary>
     public class PlayerStats
     {
         /// <summary>
-        /// 
+        /// The list of shuffle infos
         /// </summary>
         public List<BlackjackResult> gameResults = new List<BlackjackResult>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public int curShuffle = 0;
-
 
         /// <summary>
-        /// 
+        /// Method adds the info about a new shuffle
         /// </summary>
-        /// <param name="p"></param>
-        /// <param name="shuffleNo"></param>
+        /// <param name="p"><see cref="Player"/> object</param>
+        /// <param name="shuffleNo">The shuffe number</param>
         public void AddShuffleResult( Player p, int shuffleNo )
         {
             int nPlayer = gameResults.FindIndex( g => g.player.Name == p.Name );
@@ -84,10 +29,6 @@ namespace Blackjack
                 gameResults[nPlayer].shuffles.Add( shuffleNo );
                 gameResults[nPlayer].results.Add( p.PlayResult );
                 gameResults[nPlayer].stakes.Add( p.Stake );
-            }
-            else
-            {
-                gameResults.Add( new BlackjackResult(p, curShuffle) );
             }
         }
     }

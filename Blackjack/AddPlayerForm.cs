@@ -1,27 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace Blackjack
 {
     /// <summary>
-    /// 
+    /// The modes of AddPlayerForm
     /// </summary>
     public enum PlayerMode
     {
+        /// <summary>
+        /// Adding new player
+        /// </summary>
         PM_ADD,
+        /// <summary>
+        /// Editing existing player
+        /// </summary>
         PM_EDIT
     }
 
 
     /// <summary>
-    /// 
+    /// The class of the Form for adding/editing players
     /// </summary>
     public partial class AddPlayerForm : Form
     {
@@ -29,11 +29,11 @@ namespace Blackjack
         private Player player = null;
         
         /// <summary>
-        /// 
+        /// Parameterized constructor
         /// </summary>
-        /// <param name="pm"></param>
-        /// <param name="p"></param>
-        public AddPlayerForm( PlayerMode pm = PlayerMode.PM_ADD, Player p  = null)
+        /// <param name="pm">Window mode (PM_ADD is default)</param>
+        /// <param name="p"><see cref="Player"/> object</param>
+        public AddPlayerForm( PlayerMode pm = PlayerMode.PM_ADD, Player p = null)
         {
             InitializeComponent();
 
@@ -51,9 +51,9 @@ namespace Blackjack
         }
 
         /// <summary>
-        /// 
+        /// Getter for changed player
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see cref="Player"/> object</returns>
         public Player GetPlayer()
         {
             return player;
@@ -61,28 +61,35 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// The method is invoked after pressing "Add" (in PM_ADD mode) or "OK" (in PM_EDIT mode)
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void buttonAddPlayerClick(object sender, EventArgs e)
+        private void buttonAddPlayerClick(object sender, EventArgs e)
         {
+            // try parsin text in the "money" field
             try
             {
+                // adding
                 if (windowMode == PlayerMode.PM_ADD)
-                    player = new Player(this.textBoxPlayerName.Text, int.Parse(this.textBoxPlayerMoney.Text));
+                {
+                    player = new Player( this.textBoxPlayerName.Text,
+                                            int.Parse(this.textBoxPlayerMoney.Text));
+                }
+                // editing
                 else
                 {
                     player.Name = this.textBoxPlayerName.Text;
                     player.Money = int.Parse(this.textBoxPlayerMoney.Text);
                 }
+                // if everything's OK then we close the form with DialogResult Ok
                 DialogResult = DialogResult.OK;
             }
+            // if somethings's wrong
             catch (FormatException)
             {
                 MessageBox.Show( "Wrong number format (the money field must contain only digits)" );
             }
         }
+
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
