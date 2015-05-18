@@ -2,11 +2,13 @@
 Blackjack with GUI in C# and WinForms
 
 The features and rules of implemented Blackjack game:
-* single-player mode (one player vs. dealer)
+* up to 7 players vs. dealer
+* Players can join the game after each completed shuffle
 * 4 decks
 * European type ("no hole card")
 * <i>Double down</i> is possible
 * The rule of 777
+* Player and shuffle stats
 
 See SDD folder for the class diagram of a project
 
