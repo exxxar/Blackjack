@@ -18,7 +18,7 @@ namespace Blackjack
         public const int MIN_STAKE = 100;
 
         /// <summary>
-        /// The number of decks is 4 
+        /// The number of decks is 4
         /// </summary>
         public const int DECKS_COUNT = 4;
         protected Deck[] decks = new Deck[DECKS_COUNT];	            // Shoes, DECKS_COUNT decks
