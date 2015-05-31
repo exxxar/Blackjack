@@ -47,7 +47,7 @@ namespace Blackjack
             player = p;
             shuffles.Add( shuffleNo );
             results.Add( p.PlayResult );
-            stakes.Add(p.Stake);
+            stakes.Add( p.Stake );
         }
     }
 }

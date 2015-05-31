@@ -29,8 +29,15 @@ namespace Blackjack
         /// </summary>
         public const int MAX_PLAYERS = 7;
 
-        protected CardHolder dealer = new CardHolder("Dealer");		// composite for the dealer
-        protected List<Player> players = new List<Player>();		// aggregates the player
+        /// <summary>
+        /// composite for the dealer
+        /// </summary>
+        protected CardHolder dealer = new CardHolder("Dealer");
+
+        /// <summary>
+        /// aggregates the player
+        /// </summary>
+        protected List<Player> players = new List<Player>();
         
 
         /// <summary>
@@ -86,7 +93,6 @@ namespace Blackjack
                 p.SetScoreCounter(scoreCounter);
                 players.Add(p);
                 playerStates.Add(PlayerState.HIT);
-
             }
         }
 
@@ -377,9 +383,9 @@ namespace Blackjack
             }
             // ------------------------------------------------------
 
-            // randomly shuffle all decks (don't use foreach! otherwise all decks will be the same)
+            // randomly shuffle all decks (don't use foreach (?)! otherwise all decks will be the same)
             for (int i = 0; i < DECKS_COUNT; i++)
-                decks[i].Shuffle();
+                decks[i].Shuffle( i+1 );
 
             // initialize totalLose
             totalLose = 0;

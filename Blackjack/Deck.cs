@@ -29,8 +29,6 @@ namespace Blackjack
         /// </summary>
 	    public void UnpackNew()
         {
-            Random r = new Random();
-
             cards.Clear();
             for (byte i = 0; i < DECK_SIZE; i++)
             {
@@ -48,10 +46,10 @@ namespace Blackjack
         /// <summary>
         /// Method shuffles new deck
         /// </summary>
-	    public void Shuffle()
+	    public void Shuffle( int nDeck )
         {
             UnpackNew();
-            Random rand = new Random( DateTime.Now.Millisecond );
+            Random rand = new Random( nDeck );
             cards = cards.OrderBy(item => rand.Next()).ToList();
         }
     }

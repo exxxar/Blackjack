@@ -131,7 +131,13 @@ namespace Blackjack
 
             try
             {
-                nColumns = gameStats.gameResults.Max(t => t.shuffles.Count);
+                // not shuffles.Count! rather last shuffleNo! and additional check for shuffles.Count != 0
+                nColumns = gameStats.gameResults.Max( t =>
+                                                        {
+                                                            if (t.shuffles.Count > 0) return t.shuffles.Last();
+                                                            else return -1;
+                                                        });
+                nColumns++;
             }
             catch (InvalidOperationException)
             {
