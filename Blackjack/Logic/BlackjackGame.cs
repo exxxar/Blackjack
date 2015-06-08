@@ -295,9 +295,14 @@ namespace Blackjack
                     // если при блекджеке игрока нет блекджека дилера,
                     if (!CheckBlackJack(dealer))
                     {
+					    // если три семерки, это особая ситуация доп. выигрыш игроку (2 к 1)
+                        if ( Check777(players[nPlayer]) )
+                        {
+                            players[nPlayer].BonusStake( 2 );
+                        }
                         // то еще проверяем, по сколько у них карт:			
                         // если у дилера больше 1 карты, т.е. он пытался добрать карты, чтобы "перебить" блекджек игрока    
-                        if (dealer.PlayerHand.GetCardsNumber() > 1)
+                        else if (dealer.PlayerHand.GetCardsNumber() > 1)
                             // то выигрыш игрока должен быть 3 к 2 (по умолчанию)
                             players[nPlayer].BonusStake();
 
@@ -307,12 +312,6 @@ namespace Blackjack
                                     && players[nPlayer].PlayerHand.GetCardsNumber() == 2)
                             // в таком случае тоже выигрыш игрока равен 3 к 2
                             players[nPlayer].BonusStake();
-
-                        // еще если три семерки, доп. выигрыш игроку (2 к 1)
-                        if (Check777(players[nPlayer]) == true)
-                        {
-                            players[nPlayer].BonusStake();
-                        }
                     }
                 }
 	        }
