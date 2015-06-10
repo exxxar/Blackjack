@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Blackjack
 {
     /// <summary>
-    /// BlackjackGame class
+    /// BlackjackGame class represents the BlackJack card game entity
     /// </summary>
     public class BlackjackGame: ICardGame
     {
         /// <summary>
-        /// 
+        /// The size of minimal stake
         /// </summary>
         public const int MIN_STAKE = 100;
 
@@ -21,7 +18,11 @@ namespace Blackjack
         /// The number of decks is 4
         /// </summary>
         public const int DECKS_COUNT = 4;
-        protected Deck[] decks = new Deck[DECKS_COUNT];	            // Shoes, DECKS_COUNT decks
+
+        /// <summary>
+        /// Shoes, DECKS_COUNT decks
+        /// </summary>
+        protected Deck[] decks = new Deck[DECKS_COUNT];
 
         
         /// <summary>
@@ -30,12 +31,12 @@ namespace Blackjack
         public const int MAX_PLAYERS = 7;
 
         /// <summary>
-        /// composite for the dealer
+        /// Composite for the dealer
         /// </summary>
         protected CardHolder dealer = new CardHolder("Dealer");
 
         /// <summary>
-        /// aggregates the player
+        /// Aggregates the player
         /// </summary>
         protected List<Player> players = new List<Player>();
         
@@ -46,28 +47,30 @@ namespace Blackjack
         /// </summary>
         private List<PlayerState> playerStates = new List<PlayerState>();
 
-
+        /// <summary>
+        /// BlackjackScoreCounter object for calculation of the total number of points in a cardset
+        /// </summary>
         IScoreCounter scoreCounter = new BlackjackScoreCounter();
 
 
         /// <summary>
-        /// 
+        /// Dealer's total lose property (can be +2000 or -1500, for instance)
         /// </summary>
-        public int totalLose = 0;
+        public int TotalLose { get; set; }
 
         /// <summary>
-        /// 
+        /// DealerBlackjack property (we don't store this info in enum like in case of player)
         /// </summary>
-        public bool dealerBlackjack = false;
+        public bool DealerBlackjack { get; set; }
         
         /// <summary>
-        /// 
+        /// DealerBust property (we don't store this info in enum like in case of player)
         /// </summary>
-        public bool dealerBust = false;
+        public bool DealerBust { get; set; }
 
         
         /// <summary>
-        /// 
+        /// Default constructor
         /// </summary>
         public BlackjackGame()
         {
@@ -76,14 +79,16 @@ namespace Blackjack
             for (int i = 0; i < DECKS_COUNT; i++)
                 decks[i] = new Deck();
 
-            totalLose = 0;
+            TotalLose = 0;
+
+            DealerBlackjack = DealerBust = false;
         }
 	
 
         /// <summary>
-        /// 
+        /// Method forms the list of players for a current game
         /// </summary>
-        /// <param name="list"></param>
+        /// <param name="list">Collection of players</param>
         public void SetPlayerList( IEnumerable<Player> list )
         {
             players.Clear();
@@ -98,9 +103,8 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method removes all players 
         /// </summary>
-        /// <param name="minstake"></param>
         public void RemovePlayersMinStake()
         {
             for ( int i=0; i<players.Count; i++ )
@@ -113,10 +117,10 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method returns the player by his/her number
         /// </summary>
-        /// <param name="pos"></param>
-        /// <returns></returns>
+        /// <param name="pos">Player's number</param>
+        /// <returns>Player</returns>
         public Player GetPlayer(int pos)
         {
             return players[pos];
@@ -124,7 +128,7 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method returns the dealer object
         /// </summary>
         /// <returns></returns>
         public CardHolder GetDealer()
@@ -134,10 +138,10 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method returns the deck by its number
         /// </summary>
-        /// <param name="pos"></param>
-        /// <returns></returns>
+        /// <param name="pos">Deck's number</param>
+        /// <returns>Deck</returns>
         public Deck GetDeck(int pos)
         {
             return decks[pos];
@@ -145,9 +149,9 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method return the total number of players
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Total number of players</returns>
         public int GetPlayersCount()
         {
             return players.Count;
@@ -155,10 +159,11 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method sets a player's state
         /// </summary>
-        /// <param name="nPlayer"></param>
-        /// <param name="state"></param>
+        /// <param name="nPlayer">Player's number</param>
+        /// <param name="state">Player's state</param>
+        /// <exception cref="InvalidOperationException">Exception is thrown if the player has not enough money to double down</exception>
         public void SetPlayerState(int nPlayer, PlayerState state)
         {
             if (state == PlayerState.DOUBLE)
@@ -174,10 +179,10 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method gets a player's state
         /// </summary>
-        /// <param name="nPlayer"></param>
-        /// <returns></returns>
+        /// <param name="nPlayer">Player's number</param>
+        /// <returns>Player's state</returns>
         public PlayerState GetPlayerState(int nPlayer)
         {
             return playerStates[nPlayer];
@@ -185,7 +190,7 @@ namespace Blackjack
         
 
         /// <summary>
-        /// 
+        /// Helper function that checks states of all players
         /// </summary>
         /// <returns></returns>
         public bool CheckStates()
@@ -201,8 +206,8 @@ namespace Blackjack
         }
 
 
-                /// <summary>
-        /// 
+        /// <summary>
+        /// Helper function that checks if the game's finished (all players have definite results)
         /// </summary>
         public bool CheckGameFinished()
         {
@@ -216,11 +221,11 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method analyzes and forms the results of the game for a particular player
         /// </summary>
-        /// <param name="nPlayer"></param>
-        /// <returns></returns>
-	    public int PlayResults( int nPlayer )
+        /// <param name="nPlayer">Player</param>
+        /// <returns>1 - Player wins; 0 - Stay; -1 - Player loses</returns>
+	    public int GameResults( int nPlayer )
         {
             // recalculate total lose for casino if some of the players loses
                         
@@ -228,11 +233,11 @@ namespace Blackjack
             if (GetPlayerState(nPlayer) == PlayerState.BUST)
             {
                 players[nPlayer].LoseStake();
-                totalLose -= players[nPlayer].Stake;
+                TotalLose -= players[nPlayer].Stake;
                 return -1;
             }
 
-            // сначала проверим и начислим, если нужно, бонусы игроку
+            // first, set bonuses (if there are any) to the player
             SetBonuses( nPlayer );
 
 
@@ -242,19 +247,19 @@ namespace Blackjack
                 // additional check!
                 if (GetPlayer(nPlayer).PlayResult != PlayerResult.WIN)
                 {
-                    totalLose += players[nPlayer].Stake;
+                    TotalLose += players[nPlayer].Stake;
                 }
                 players[nPlayer].WinStake();
                 return 1;
             }
 
-            // далее обычное сравнение по очкам:
+            // then simply compare the score:
 
             // DEALER WINS
 	        if ( players[ nPlayer ].CountScore() < dealer.CountScore() )
 	        {
                 players[ nPlayer ].LoseStake();
-                totalLose -= players[nPlayer].Stake;
+                TotalLose -= players[nPlayer].Stake;
                 return -1;
 	        }
             // PLAYER WINS
@@ -263,7 +268,7 @@ namespace Blackjack
                 // additional check if the player has already taken the win
                 if ( GetPlayer(nPlayer).PlayResult != PlayerResult.WIN )
                 {
-                    totalLose += players[nPlayer].Stake;
+                    TotalLose += players[nPlayer].Stake;
                 }
                 players[nPlayer].WinStake();
                 return 1;
@@ -274,6 +279,7 @@ namespace Blackjack
                 // it can happen if afer the 1st dealer hit player already chose win 1-to-1
                 if ( players[nPlayer].PlayResult != PlayerResult.WIN )      
                     players[nPlayer].PlayResult = PlayerResult.STAY;
+
                 return 0;
             }
         }
@@ -281,7 +287,13 @@ namespace Blackjack
 	    
 
         /// <summary>
-        /// 
+        /// Method sets bonus stakes for a player under certain circumstances among which are:
+        /// <ul>
+        ///     <li>Player's got Blackjack and dealer has more than one card</li>
+        ///     <li>Player's got Blackjack on the first two cards</li>
+        ///     <li>Player has 777</li>
+        ///     <li>Dealer's got blackjack</li>
+        /// </ul>
         /// </summary>
         /// <param name="nPlayer"></param>
 	    public void SetBonuses( int nPlayer )
@@ -319,10 +331,10 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method checks if a card holder's got the BlackJack
         /// </summary>
-        /// <param name="cardHolder"></param>
-        /// <returns></returns>
+        /// <param name="cardHolder">Card holder</param>
+        /// <returns>true if a cardholder's got the BlackJack; false - otherwise</returns>
 	    public bool CheckBlackJack( CardHolder cardHolder )
         {
             return (cardHolder.CountScore() == 21);
@@ -330,10 +342,10 @@ namespace Blackjack
 	
 
         /// <summary>
-        /// 
+        /// Method checks if a card holder's got the BlackJack with "777" combination
         /// </summary>
-        /// <param name="cardHolder"></param>
-        /// <returns></returns>
+        /// <param name="cardHolder">Card holder</param>
+        /// <returns>true if a cardholder's got the "777" combination; false - otherwise</returns>
         public bool Check777( CardHolder cardHolder )
         {
             if (cardHolder.CountScore() == 21)
@@ -350,10 +362,10 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method pops a card from random deck
         /// </summary>
-        /// <param name="nDeck"></param>
-        /// <returns></returns>
+        /// <param name="nDeck">The number of a deck from which a card was popped</param>
+        /// <returns>The card popped from the deck</returns>
         public Card PopCardFromDeck( out int nDeck )
         {
             Random r = new Random();
@@ -363,13 +375,12 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Initialize new shuffle (start new game)
         /// </summary>
         public void Shuffle()
         {
             // initialize dealer states
-            dealerBlackjack = false;
-            dealerBust = false;
+            DealerBlackjack = DealerBust = false;
             
             // ------------------------------------------ clear hands
             dealer.ClearHand();				
@@ -382,12 +393,12 @@ namespace Blackjack
             }
             // ------------------------------------------------------
 
-            // randomly shuffle all decks (don't use foreach (?)! otherwise all decks will be the same)
+            // randomly shuffle all decks with different seed
             for (int i = 0; i < DECKS_COUNT; i++)
                 decks[i].Shuffle( i+1 );
 
-            // initialize totalLose
-            totalLose = 0;
+            // initialize TotalLose
+            TotalLose = 0;
         }
     }
 }

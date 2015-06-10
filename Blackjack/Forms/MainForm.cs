@@ -1,58 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
 namespace Blackjack
 {
     /// <summary>
-    /// 
+    /// Main form class
     /// </summary>
     public partial class MainForm : Form
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private BlackjackGame game = null;
+        // Our design implies that we have such objects:
         
-        /// <summary>
-        /// 
-        /// </summary>
+        // The game
+        private BlackjackGame game = null;
+
+        // The game controller (responds to user actions, communicates with visualizer)
         private CardTableController gamecontroller = null;
         
-        /// <summary>
-        /// 
-        /// </summary>
+        // The visualizer of a card table
         private CardTableVisualizer gamevisualizer = null;
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
+        // Stats
         private PlayerStats statistics = new PlayerStats();
         
-        /// <summary>
-        /// 
-        /// </summary>
-        public int curShuffle = 0;
+        private int curShuffle = 0;
         
 
         /// <summary>
-        /// 
+        /// Default constructor
         /// </summary>
         public MainForm()
         {
             InitializeComponent();
         }
 
+
         /// <summary>
-        /// 
+        /// Method is called when the game's over and adds its result to the stats table
         /// </summary>
         public void FixGameResults()
         {
@@ -64,27 +49,32 @@ namespace Blackjack
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
+            // firstly, show the Players form
             PlayersForm form = new PlayersForm();
+
+            // if we added at least one player and pressed OK, then start:
             if (form.ShowDialog() == DialogResult.OK)
             {
-                statistics = form.gameStats;
+                statistics = form.GameStats;
 
+                // create new game object
                 game = new BlackjackGame();
 
+                // initialize visualizer
                 gamevisualizer = new CardTableVisualizer(game);
                 gamevisualizer.PrepareGraphics(this.Width, this.Height, CreateGraphics());
 
+                // initialize controller:
+                // pass the game and visualizer objects
+                // and the FixGameResults() function as the function that will be called when the game's over
                 gamecontroller = new CardTableController(game, gamevisualizer, FixGameResults);
 
+                // set the list of active players for a new game
                 game.SetPlayerList( form.GetActivePlayers() );
 
+                // start new game
                 NewGame();
             }
             else
@@ -96,19 +86,29 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method shows PlayersForm for editing players
         /// </summary>
         private void ChangePlayers()
         {
-            PlayersForm form = new PlayersForm();
-            form.gameStats = statistics;
-            form.ShowDialog();
-            statistics = form.gameStats;
-
-            if (form.bChangedPlayer)
+            // if the current game is not finished yet
+            if ( !game.CheckGameFinished() )
             {
+                MessageBox.Show("Please wait until the end of current game!");
+                return;
+            }
+
+            PlayersForm form = new PlayersForm();
+            form.GameStats = statistics;
+            form.ShowDialog();
+
+            statistics = form.GameStats;
+
+            if (form.ChangedPlayer)
+            {
+                // set the list of active players for a new game
                 game.SetPlayerList( form.GetActivePlayers() );
 
+                // start new game
                 NewGame();
             }
         }
@@ -146,27 +146,25 @@ namespace Blackjack
         }
        
 
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_MouseClick(object sender, MouseEventArgs e)
         {
-            if (gamevisualizer.bPlayersHighlight)
+            // if the user clicked "Edit Players" icon
+            if (gamevisualizer.PlayersHighlight)
             {
                 ChangePlayers();
             }
-            else if (gamevisualizer.bNewGameHighlight)
+            // if the user clicked "F2 - new game"
+            else if (gamevisualizer.NewGameHighlight)
             {
                 if (!game.CheckStates())
                 {
                     MessageBox.Show("Please wait until the end of current game!");
                     return;
                 }
+
                 NewGame();
             }
+            // otherwise user perhaps clicked on some action button
             else if ( !game.CheckGameFinished() )
             {
                 try
@@ -181,63 +179,51 @@ namespace Blackjack
         }
 
 
-        /// <summary>
-        /// New game (new shuffle) can be initiated by user pressing F2
-        /// </summary>
-        /// <param name="sender">The sender of KeyDown event</param>
-        /// <param name="e">The arguments of KeyDown event</param>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            // New game can be initiated by user pressing F2
             if (e.KeyCode == Keys.F2)
             {
-                if (!game.CheckStates())
+                // if the current game is not finished yet
+                if ( !game.CheckGameFinished() )
                 {
                     MessageBox.Show("Please wait until the end of current game!");
                     return;
                 }
+
+                // otherwise
                 NewGame();
             }
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
         {
             Graphics DC = CreateGraphics();
             Rectangle playerRect = new Rectangle(735, 5, 30, 40);
             Rectangle newGameRect = new Rectangle(60, 10, 180, 20);
 
-            gamevisualizer.bPlayersHighlight = (playerRect.Contains( e.Location) ) ? true : false;
-            gamevisualizer.bNewGameHighlight = (newGameRect.Contains(e.Location)) ? true : false;
+            gamevisualizer.PlayersHighlight = (playerRect.Contains( e.Location) ) ? true : false;
+            gamevisualizer.NewGameHighlight = (newGameRect.Contains(e.Location)) ? true : false;
+
             gamevisualizer.Invalidate();
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainForm_Resize(object sender, EventArgs e)
         {
+            // if the form was resized...
             Graphics DC = CreateGraphics();
+            // create new double buffered bitmap
             gamevisualizer.PrepareGraphics(this.Width, this.Height, DC);
-            DC.DrawImage(gamevisualizer.GetShowTable(), 0, 0);
+            // and plot it
+            DC.DrawImage( gamevisualizer.GetShowTable(), 0, 0 );
         }
     }
 }

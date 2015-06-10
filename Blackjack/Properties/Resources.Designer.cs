@@ -63,16 +63,6 @@ namespace Blackjack.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _double {
-            get {
-                object obj = ResourceManager.GetObject("_double", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap blackjack_21 {
             get {
                 object obj = ResourceManager.GetObject("blackjack_21", resourceCulture);
@@ -96,6 +86,16 @@ namespace Blackjack.Properties {
         internal static System.Drawing.Bitmap casino_chips_md {
             get {
                 object obj = ResourceManager.GetObject("casino-chips-md", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap double_down {
+            get {
+                object obj = ResourceManager.GetObject("double_down", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

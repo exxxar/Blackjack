@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace Blackjack
+﻿namespace Blackjack
 {
     /// <summary>
     /// The enum for possible states players can have

@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace Blackjack
+﻿namespace Blackjack
 {
     /// <summary>
     /// Interface for classes implementing different score counting techniques (for cardsets)

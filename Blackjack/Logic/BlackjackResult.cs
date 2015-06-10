@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 
 namespace Blackjack
@@ -10,7 +9,7 @@ namespace Blackjack
     public class BlackjackResult
     {
         /// <summary>
-        /// The player
+        /// The player whose stats are tracked
         /// </summary>
         public Player player;
 

@@ -36,19 +36,35 @@ namespace Blackjack
         private Point[] playerCoords = new Point[BlackjackGame.MAX_PLAYERS];
         private Point[] shoesCoords = new Point[BlackjackGame.DECKS_COUNT];
 
-        // the array of coordinates of the lowest card in each deck
+        // the array of coordinates of the top card in each deck
         private Point[] shoesCoordsToDraw = new Point[BlackjackGame.DECKS_COUNT];
-        
+
+        /// <summary>
+        /// the array of coordinates of the HIT options for each player;
+        /// the array is used by gameController (!) so it's public
+        /// </summary>
+        public Rectangle[] hitrects = new Rectangle[BlackjackGame.MAX_PLAYERS];
+        /// <summary>
+        /// the array of coordinates of the STAND options for each player;
+        /// the array is used by gameController (!) so it's public
+        /// </summary>
+        public Rectangle[] standrects = new Rectangle[BlackjackGame.MAX_PLAYERS];
+        /// <summary>
+        /// the array of coordinates of the DOUBLE options for each player;
+        /// the array is used by gameController (!) so it's public
+        /// </summary>
+        public Rectangle[] doublerects = new Rectangle[BlackjackGame.MAX_PLAYERS];
+
 
         /// <summary>
         /// The boolean variable that indicates whether the mouse is over the "Players" icon
         /// </summary>
-        public bool bPlayersHighlight = false;
+        public bool PlayersHighlight { get; set; }
 
         /// <summary>
         /// The boolean variable that indicates whether the mouse is over the "New game" text
         /// </summary>
-        public bool bNewGameHighlight = false;
+        public bool NewGameHighlight { get; set; }
         
 
         /// <summary>
@@ -59,7 +75,11 @@ namespace Blackjack
         /// <param name="blackjackgame">The game to visualize</param>
         public CardTableVisualizer( BlackjackGame blackjackgame )
         {
+            // attach the game object
             game = blackjackgame;
+
+            //
+            PlayersHighlight = NewGameHighlight = false;
 
             // try to load the Cards.dll assembly and all cards from it
             try
@@ -81,7 +101,7 @@ namespace Blackjack
                 System.Windows.Forms.Application.Exit();
             }
 
-            // ------------------------------------------------------------------ set up the coordinates
+            // ----------------- set up the coordinates of all visual objects on the card table
             dealerCoords.X = 500;
             dealerCoords.Y = 50;
 
@@ -89,6 +109,10 @@ namespace Blackjack
             {
                 playerCoords[i].X = 30 + (15 + drawCardWidth) * i;
                 playerCoords[i].Y = 320;
+
+                hitrects[i] = new Rectangle(25 + 105 * i, 285, 30, 30);
+                standrects[i] = new Rectangle(60 + 105 * i, 285, 30, 30);
+                doublerects[i] = new Rectangle(95 + 105 * i, 285, 30, 30);
             }
 
             for (int i = 0; i < BlackjackGame.DECKS_COUNT; i++)
@@ -188,7 +212,7 @@ namespace Blackjack
 
 
         /// <summary>
-        /// The method draws all cards in player's hand (shifted vaertically by 30 pixels)
+        /// Method draws all cards in player's hand (shifted vaertically by 30 pixels)
         /// </summary>
         /// <param name="nPlayer"></param>
         public void ShowPlayerHand(int nPlayer)
@@ -203,7 +227,7 @@ namespace Blackjack
 
 
         /// <summary>
-        /// The method draws the card table:
+        /// Method draws the card table:
         /// 1) card slots
         /// 2) player names, money stakes
         /// 3) dealer's info
@@ -239,12 +263,12 @@ namespace Blackjack
             }
 
             //  -------------------------------------------------------------- drawing dealer's info
-            if (game.dealerBlackjack)
+            if (game.DealerBlackjack)
             {
                 g.DrawImage(Properties.Resources.blackjack_21, 510, 7, 40, 40);
             }
 
-            if (game.dealerBust)
+            if (game.DealerBust)
             {
                 g.DrawImage(Properties.Resources.bust, 510, 10, 35, 35);
             }
@@ -253,15 +277,15 @@ namespace Blackjack
             g.DrawRectangle(whitePen, 510 + drawCardWidth, 50, drawCardWidth, drawCardHeight);
             g.DrawString("Dealer", textFont, whiteBrush, 560, 20);
 
-            string casinoMoneyString = string.Format("-{0} $", game.totalLose);
-            if (game.totalLose < 0)
+            string casinoMoneyString = string.Format("-{0} $", game.TotalLose);
+            if (game.TotalLose < 0)
                 casinoMoneyString = casinoMoneyString.Replace("--", "+");
             g.DrawString(casinoMoneyString, textFont, whiteBrush, 650, 20);
 
             // --------------------------------------------------------------------------------------
 
-            // enlarges the Player icon if the mouse is over it 
-            if (bPlayersHighlight)
+            // enlarges the Player icon when the mouse is over it 
+            if (PlayersHighlight)
             {
                 g.DrawImage(Properties.Resources.player, 730, 5, 50, 60);
             }
@@ -271,7 +295,7 @@ namespace Blackjack
             }
 
             // changes the color of the "New Game - F2" text into yellow if the mouse is over it
-            if (bNewGameHighlight)
+            if (NewGameHighlight)
             {
                 g.DrawString("New Game - F2", gameFont, yellowBrush, 60, 10);
             }
@@ -292,7 +316,7 @@ namespace Blackjack
 
 
         /// <summary>
-        /// The method draws:
+        /// Method draws:
         /// 1) results of the game for each player
         /// 2) the set of possible options for each player at the current moment
         /// 3) additional things such as the Blackjack sign and bust sign
@@ -324,7 +348,7 @@ namespace Blackjack
                 {
                     g.DrawImage(Properties.Resources.hit, 25 + (15 + drawCardWidth) * i, 285, 30, 30);
                     g.DrawImage(Properties.Resources.stand, 60 + (15 + drawCardWidth) * i, 285, 30, 30);
-                    g.DrawImage(Properties.Resources._double, 95 + (15 + drawCardWidth) * i, 285, 30, 30);
+                    g.DrawImage(Properties.Resources.double_down, 95 + (15 + drawCardWidth) * i, 285, 30, 30);
                 }
 
                 if (game.GetPlayerState(i) == PlayerState.BLACKJACK)

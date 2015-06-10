@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,55 +6,58 @@ using System.Threading.Tasks;
 namespace Blackjack
 {
     /// <summary>
-    /// 
+    /// Handler of the GameOver event (passed to the caller)
     /// </summary>
     public delegate void GameOverHandler();
 
 
     /// <summary>
-    /// 
+    /// Controller class is responsive for interaction between the visualizer and the game
     /// </summary>
     public class CardTableController
     {
-        BlackjackGame game = null;
-        CardTableVisualizer cardtable = null;
+        private BlackjackGame game = null;
+        private CardTableVisualizer cardtable = null;
 
         /// <summary>
-        /// 
+        /// GameOver event (passed to the caller)
         /// </summary>
-        public event GameOverHandler OnGameOver;
+        public event GameOverHandler GameOver;
 
         /// <summary>
-        /// 
+        /// The number of players who refused to take winning 1-to-1 immediately after the blackjack on two cards
+        /// (causing dealer to wait until the end of a shuffle)
         /// </summary>
         private byte nDealerWaits = 0;
 
         
         
         /// <summary>
-        /// 
+        /// Controller's constructor sets the objects passed as parameters
         /// </summary>
-        /// <param name="blackjackgame"></param>
-        /// <param name="gamevisualizer"></param>
-        /// <param name="handler"></param>
+        /// <param name="blackjackgame">The game object</param>
+        /// <param name="gamevisualizer">The visualizer object</param>
+        /// <param name="handler">The GameOver event handler (caller's function - in our case it's in the MainForm)</param>
         public CardTableController( BlackjackGame blackjackgame, CardTableVisualizer gamevisualizer, GameOverHandler handler )
         {
             game = blackjackgame;
             cardtable = gamevisualizer;
-            OnGameOver += handler;
+            GameOver += handler;
         }
-
-
-
+        
+        
         #region Actions
-
+        
         /// <summary>
-        /// 
+        /// Method starts new game (new shuffle)
         /// </summary>
         public async void StartNewShuffle()
         {
+            // new game
             game.Shuffle();
+            nDealerWaits = 0;
 
+            // give two cards to each player
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 await Task.Delay(700);
@@ -68,40 +66,41 @@ namespace Blackjack
                 MoveCardToPlayer(i);
             }
 
+            // give card to the dealer
             await Task.Delay(700);
             MoveCardToDealer();
-
-
-            nDealerWaits = 0;
-
+            
+            // iterate across all players and see if someone's got blackjack on 2 cards
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
+                // in that case dealer should act specially
                 DealerFirstHit(i);
             }
         }
 
 
-
         /// <summary>
-        /// 
+        /// Give a card to a player from the top of some deck (with animation)
         /// </summary>
-        /// <param name="nPlayer"></param>
-        public void MoveCardToPlayer( int nPlayer )
+        /// <param name="nPlayer">The ordinal number of a player to give card to</param>
+        private void MoveCardToPlayer( int nPlayer )
         {
             int nDeck;
             Card card = game.PopCardFromDeck( out nDeck );
 
             //Animate
             cardtable.DrawCard(card, nDeck);
-            Thread.Sleep( 300 );
+            Thread.Sleep( 300 );                    // yeah, I know (((
             cardtable.DrawShoes();
 
+            // Player can get busted or get a score of 21 after receiving new card 
             try
             {
                 game.GetPlayer( nPlayer ).TakeCard(card);
             }
             catch (BustException)
             {
+                // setting the BUST state and indicating LOSE right away (no matter what the dealer will get)
                 game.SetPlayerState(nPlayer, PlayerState.BUST);
                 game.GetPlayer(nPlayer).PlayResult = PlayerResult.LOSE;
             }
@@ -117,43 +116,44 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Give a card to the dealer from the top of some deck (with animation)
         /// </summary>
-        public void MoveCardToDealer()
+        private void MoveCardToDealer()
         {
             cardtable.DrawOptions();
 
-            Random r = new Random();
-            int nDeck = r.Next( BlackjackGame.DECKS_COUNT );
-
+            int nDeck;
             Card card = game.PopCardFromDeck(out nDeck);
 
+            // Dealer can get busted or get a score of 21 after receiving new card (just like any player)
             try
             {
                 game.GetDealer().TakeCard( card );
             }
             catch (BustException)
             {
-                game.dealerBust = true;
+                game.DealerBust = true;
             }
             catch (BlackjackException)
             {
-                game.dealerBlackjack = true;
+                game.DealerBlackjack = true;
             }
             
             //Animate
             cardtable.DrawCard(card, nDeck);
             Thread.Sleep(300);
+            
             cardtable.DrawShoes();
             cardtable.ShowDealerHand();
+            
             cardtable.Invalidate();
         }
 
 
         /// <summary>
-        /// 
+        /// Method checks the states of all players
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if all players are busted or won the game; false - otherwise</returns>
         private bool CheckAllBustOrWon()
         {    
             int k = 0;
@@ -169,49 +169,52 @@ namespace Blackjack
 
         
         /// <summary>
-        /// 
+        /// Method emulates dealer moves
         /// </summary>
-        public void DealerHit()
+        private void DealerHit()
         {
             // if all busted or won no dealer's move!
             if ( CheckAllBustOrWon() )
             {
                 for (int i = 0; i < game.GetPlayersCount(); i++)
                 {
-                    game.PlayResults(i);
+                    game.GameResults(i);
                 }
 
-                OnGameOver();
+                // emit the GameOver event
+                GameOver();
 
                 cardtable.Invalidate();
                 return;
             }
 
-
-            while (game.GetDealer().CountScore() < 17)		// дилер здесь добирает карты, пока у него нет 17
+            // Give dealer cards until he's got 17 or more
+            while (game.GetDealer().CountScore() < 17)		
             {
-                MoveCardToDealer();				            // здесь возможен эксепшн! (он перехватывается в функции уровнем выше)
+                MoveCardToDealer();				            
                 Thread.Sleep(300);
             }
     
+            // Calculate the game results for each player
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                game.PlayResults(i);
+                game.GameResults(i);
                 cardtable.Invalidate();
             }
 
-            OnGameOver();
+            // emit the GameOver event
+            GameOver();
         }
 
 
         /// <summary>
-        /// 
+        /// Method checks if dealer should wait and not start getting cards from shoes
         /// </summary>
-        /// <returns></returns>
-        public bool DealerShouldWait( byte nDealerWaits )
+        private bool DealerShouldWait( byte nDealerWaits )
         {
             byte nTotalWaits = 0;
 
+            // count the number of cases when a player hasn't already finished the game or made a "stand"
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
                 if (game.GetPlayerState(i) == PlayerState.STAND ||
@@ -219,6 +222,7 @@ namespace Blackjack
                         nTotalWaits++;
             }
 
+            // consider also nDealerWaits
             if (nTotalWaits + nDealerWaits == game.GetPlayersCount())
                 return false;
             else
@@ -227,25 +231,21 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Method emulates the first moves of a dealer - if some player's got a blackjack on 2 cards, the dealer acts specially 
         /// </summary>
-        /// <param name="nPlayer"></param>
-        /// <returns></returns>
-        public void DealerFirstHit(int nPlayer)
+        private void DealerFirstHit(int nPlayer)
         {
-            // самое хитрое тут: сразу проверяем, вдруг у игрока блекджек на 2 картах
+            // if the player hasn't got blackjack then do nothing
             if ( game.CheckBlackJack( game.GetPlayer(nPlayer) ) )
             {
                 game.SetPlayerState(nPlayer, PlayerState.BLACKJACK);
 
-                // тут еще проверка, что и у дилера может оказаться первой карта ценой 10 или 11
-                // (но это нужно только для случая 2 карт у игрока в хэнде)
-
+                // check the first dealer's card: if it has rank of 10 or 11
                 if (game.GetPlayer(nPlayer).PlayerHand.GetCardsNumber() == 2)
                 {
                     if (game.GetDealer().CountScore() >= 10)
                     {
-                        // можно просто взять выигрыш сразу (а если нет, то может быть выигрыш 3 к 2 (если у дилера не будет блекджека)
+                        // the dealer asks player if he/she wants to take the winning right away
                         System.Windows.Forms.DialogResult res =
                                         System.Windows.Forms.MessageBox.Show(
                                         game.GetPlayer(nPlayer).Name + ", would you like to take your win 1-to-1 or keep playing " +
@@ -253,98 +253,84 @@ namespace Blackjack
                                         "Dealer's got 10, J, Q, K or A!",
                                         System.Windows.Forms.MessageBoxButtons.YesNo);
 
-                        // если берем, то в этом случае сразу выходим отсюда
+                        // if player clicks Yes then he/she wins immediately
                         if (res == System.Windows.Forms.DialogResult.Yes)
                         {
                             game.GetPlayer(nPlayer).PlayResult = PlayerResult.WIN;
-                            game.totalLose += game.GetPlayer(nPlayer).Stake;
+                            game.TotalLose += game.GetPlayer(nPlayer).Stake;
                         }
 
-                        if (res == System.Windows.Forms.DialogResult.No)
+                        // otherwise dealer will wait until the end of a shuffle and we increment nDealerWaits
+                        else if (res == System.Windows.Forms.DialogResult.No)
                             nDealerWaits++;
                         
                         // check if it was the last player and others are waiting
-                        
                         if ( !DealerShouldWait( nDealerWaits ) )
                                 DealerHit();
 
+                        // if game is finished
                         if (game.CheckGameFinished())
                         {
-                            OnGameOver();
+                            GameOver();
                         }
 
                         cardtable.Invalidate();
                     }
                     else
                     {
-                        // если у игрока на 2 картах блекджек, а первая карта дилера меньше 10, то он сразу проигрывает (в схватке с данным игроком)
+                        // if a player's got blackjack on 2 cards and the first dealer's card has rank less than 10
+                        // the dealer loses immediately to this player (and if there's only one player we finish the game here)
                         if (game.GetPlayersCount() == 1)
                         {                       
-                            game.PlayResults( nPlayer );
-                            
-                            //game.GetPlayer(nPlayer).BonusStake();
-                            //game.GetPlayer(nPlayer).WinStake();
-                            //game.totalLose += game.GetPlayer(nPlayer).Stake;
-
-                            OnGameOver();
+                            game.GameResults( nPlayer );
+                            GameOver();
                         }
                     }
                 }
             }
         }
 
-
-
         #endregion
 
 
 
         /// <summary>
-        /// 
+        /// Process the actions of a player (mouse click on HIT, STAND or DOUBLE)
         /// </summary>
         /// <param name="mousePoint"></param>
         public void UserActions( Point mousePoint )
         {
-            Rectangle[] hitrects = new Rectangle[ BlackjackGame.MAX_PLAYERS ];
+            // check the mouse location (over HIT, STAND or DOUBLE option)
             for (int i = 0; i < game.GetPlayersCount(); i++)
             {
-                hitrects[i] = new Rectangle(25 + 105 * i, 285, 30, 30);
-                if (hitrects[i].Contains(mousePoint) && 
+                if ( cardtable.hitrects[i].Contains(mousePoint) && 
                     game.GetPlayerState(i) != PlayerState.STAND && 
                     game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED)
                 {
                     MoveCardToPlayer(i);
                 }
-            }
 
-            Rectangle[] standrects = new Rectangle[ BlackjackGame.MAX_PLAYERS ];
-            for (int i = 0; i < game.GetPlayersCount(); i++)
-            {
-                standrects[i] = new Rectangle(60 + 105 * i, 285, 30, 30);
-                if (standrects[i].Contains(mousePoint) && 
-                    game.GetPlayerState(i) != PlayerState.BUST && 
-                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED )
+                else if (cardtable.standrects[i].Contains(mousePoint) &&
+                    game.GetPlayerState(i) != PlayerState.BUST &&
+                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED)
                 {
                     game.SetPlayerState(i, PlayerState.STAND);
                     cardtable.Invalidate();
                 }
-            }
 
-            Rectangle[] doublerects = new Rectangle[ BlackjackGame.MAX_PLAYERS ];
-            for (int i = 0; i < game.GetPlayersCount(); i++)
-            {
-                doublerects[i] = new Rectangle(95 + 105 * i, 285, 30, 30);
-                if (doublerects[i].Contains(mousePoint) && 
-                    game.GetPlayerState(i) != PlayerState.STAND && 
-                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED )
+                else if (cardtable.doublerects[i].Contains(mousePoint) &&
+                    game.GetPlayerState(i) != PlayerState.STAND &&
+                    game.GetPlayer(i).PlayResult == PlayerResult.UNDEFINED)
                 {
-                   game.SetPlayerState(i, PlayerState.DOUBLE);
-                   MoveCardToPlayer(i);
-                   cardtable.Invalidate();
+                    game.SetPlayerState(i, PlayerState.DOUBLE);
+                    MoveCardToPlayer(i);
+                    cardtable.Invalidate();
                 }
             }
 
-            if (game.CheckStates())
+            // if all players (they have some of the following states: BUST, STAND or BLACKJACK)
+            if ( game.CheckStates() )
+                // dealer gets into play
                 DealerHit();
         }
     }

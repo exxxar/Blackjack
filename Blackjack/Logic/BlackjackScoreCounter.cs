@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Blackjack
+﻿namespace Blackjack
 {
     /// <summary>
-    /// 
+    /// Class for counting the total score in a cardset
     /// </summary>
     public class BlackjackScoreCounter: IScoreCounter
     {
         /// <summary>
-        /// 
+        /// Main method counts the total score
         /// </summary>
-        /// <param name="hand"></param>
-        /// <returns></returns>
+        /// <param name="hand">The set of cards for which the score is calculated</param>
+        /// <returns>Total score in the cardset</returns>
         public byte CountScore(CardSet hand)
         {
             byte score = 0;

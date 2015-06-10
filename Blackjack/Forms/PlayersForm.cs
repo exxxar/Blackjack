@@ -1,39 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
 namespace Blackjack
 {
     /// <summary>
-    /// 
+    /// Form with stats of active players
     /// </summary>
     public partial class PlayersForm : Form
     {
         /// <summary>
-        /// 
+        /// Property that indicates if some player's info was changed after loading of the form
         /// </summary>
-        public bool bChangedPlayer = false;
+        public bool ChangedPlayer { get; set; }
 
         /// <summary>
-        /// 
+        /// Game stats property
         /// </summary>
-        public PlayerStats gameStats { get; set; }
+        public PlayerStats GameStats { get; set; }
+
 
         /// <summary>
-        /// 
+        /// Default constructor
         /// </summary>
         public PlayersForm()
         {
             InitializeComponent();
-
-            gameStats = new PlayerStats();
+            GameStats = new PlayerStats();
+            ChangedPlayer = false;
         }
 
 
@@ -48,7 +44,6 @@ namespace Blackjack
             if (listViewPlayers.Items.Count > 0)
             {
                 DialogResult = DialogResult.OK;
-                Close();
             }
         }
 
@@ -60,14 +55,15 @@ namespace Blackjack
 
             int selIdx = listViewPlayers.SelectedIndices[0];
             listViewPlayers.Items.RemoveAt( selIdx );
-            gameStats.gameResults.RemoveAt( selIdx );
+            GameStats.gameResults.RemoveAt( selIdx );
 
-            bChangedPlayer = true;
+            ChangedPlayer = true;
         }
 
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
+            // check if all MAX_PLAYERS players are in the game already
             if (GetActivePlayers().Count() == BlackjackGame.MAX_PLAYERS)
             {
                 MessageBox.Show( string.Format(
@@ -76,6 +72,7 @@ namespace Blackjack
                 return;
             }
 
+            // try adding new player
             AddPlayerForm form = new AddPlayerForm();
             if (form.ShowDialog() == DialogResult.OK)
             {
@@ -85,9 +82,9 @@ namespace Blackjack
                 res.shuffles = new List<int>();
                 res.stakes = new List<int>();
 
-                gameStats.gameResults.Add( res );
+                GameStats.gameResults.Add( res );
 
-
+                // find the current shuffle (current column in the stats table)
                 int nColumns = TotalColumns();
 
                 ListViewItem item = new ListViewItem(string.Format("{0} ({1} $)", form.GetPlayer().Name, form.GetPlayer().Money) );
@@ -100,7 +97,7 @@ namespace Blackjack
 
                 ShowStatistics();
 
-                bChangedPlayer = true;
+                ChangedPlayer = true;
             }
         }
 
@@ -110,19 +107,20 @@ namespace Blackjack
             if (listViewPlayers.SelectedIndices.Count > 0)
             {
                 int nPlayer = listViewPlayers.SelectedIndices[0];
-                AddPlayerForm form = new AddPlayerForm( PlayerMode.PM_EDIT, gameStats.gameResults[nPlayer].player );
+                AddPlayerForm form = new AddPlayerForm( PlayerMode.PM_EDIT,
+                                                            GameStats.gameResults[nPlayer].player );
                 form.ShowDialog();
 
                 string s = string.Format("{0} ({1} $)", form.GetPlayer().Name, form.GetPlayer().Money );
                 listViewPlayers.Items[nPlayer].Text = s;
 
-                bChangedPlayer = true;
+                ChangedPlayer = true;
             }
         }
 
 
         /// <summary>
-        /// 
+        /// Find the last shuffle number in stats (this will be the last column)
         /// </summary>
         /// <returns></returns>
         private int TotalColumns()
@@ -132,7 +130,7 @@ namespace Blackjack
             try
             {
                 // not shuffles.Count! rather last shuffleNo! and additional check for shuffles.Count != 0
-                nColumns = gameStats.gameResults.Max( t =>
+                nColumns = GameStats.gameResults.Max( t =>
                                                         {
                                                             if (t.shuffles.Count > 0) return t.shuffles.Last();
                                                             else return -1;
@@ -149,7 +147,7 @@ namespace Blackjack
 
 
         /// <summary>
-        /// 
+        /// Main function here: show full stats table
         /// </summary>
         private void ShowStatistics()
         {
@@ -167,11 +165,11 @@ namespace Blackjack
                 listViewPlayers.Columns.Add("Shuffle" + (i + 1), 80);
             }
 
-            for (int j = 0; j < gameStats.gameResults.Count; j++)
+            for (int j = 0; j < GameStats.gameResults.Count; j++)
             {
                 ListViewItem item = new ListViewItem(string.Format("{0} ({1} $)",
-                                                        gameStats.gameResults[j].player.Name,
-                                                        gameStats.gameResults[j].player.Money));
+                                                        GameStats.gameResults[j].player.Name,
+                                                        GameStats.gameResults[j].player.Money));
 
                 for (int i = 0; i < nColumns; i++)
                     item.SubItems.Add("");
@@ -180,26 +178,26 @@ namespace Blackjack
             }
             
 
-            for (int i = 0; i < gameStats.gameResults.Count; i++)
+            for (int i = 0; i < GameStats.gameResults.Count; i++)
             {
                 ListViewItem item = listViewPlayers.Items[i];
 
                 int sn = 0;
 
-                foreach (var res in gameStats.gameResults[i].results)
+                foreach (var res in GameStats.gameResults[i].results)
                 {
-                    int shuffleNo = gameStats.gameResults[i].shuffles[sn];
+                    int shuffleNo = GameStats.gameResults[i].shuffles[sn];
 
                     switch (res)
                     {
                         case PlayerResult.WIN:
-                            item.SubItems[shuffleNo+1].Text = "+" + gameStats.gameResults[i].stakes[sn];
+                            item.SubItems[shuffleNo+1].Text = "+" + GameStats.gameResults[i].stakes[sn];
                             break;
                         case PlayerResult.LOSE:
-                            item.SubItems[shuffleNo+1].Text = "-" + gameStats.gameResults[i].stakes[sn];
+                            item.SubItems[shuffleNo+1].Text = "-" + GameStats.gameResults[i].stakes[sn];
                             break;
                         case PlayerResult.STAY:
-                            item.SubItems[shuffleNo+1].Text = string.Format("stay ({0})", gameStats.gameResults[i].stakes[sn]);
+                            item.SubItems[shuffleNo+1].Text = string.Format("stay ({0})", GameStats.gameResults[i].stakes[sn]);
                             break;
                     }
                     sn++;
@@ -209,12 +207,12 @@ namespace Blackjack
         
 
         /// <summary>
-        /// 
+        /// Method returns all players who've got enough money to make minimal bet
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Collection of active players</returns>
         public IEnumerable<Player> GetActivePlayers()
         {
-            var list = gameStats.gameResults.Where(p => p.player.Money > 100).ToList();
+            var list = GameStats.gameResults.Where(p => p.player.Money > BlackjackGame.MIN_STAKE).ToList();
             List<Player> players = new List<Player>();
 
             for (int i = 0; i < list.Count; i++)
