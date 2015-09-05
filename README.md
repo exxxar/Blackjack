@@ -2,7 +2,7 @@
 Blackjack with GUI in C# and WinForms
 
 The features and rules of implemented Blackjack game:
-* up to 7 players vs. dealer
+* Up to 7 players vs. dealer
 * Players can join the game after each completed shuffle
 * 4 decks
 * European type ("no hole card")
